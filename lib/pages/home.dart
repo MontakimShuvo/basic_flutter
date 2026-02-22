@@ -1,18 +1,41 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
+import '../widgets/tab_item.dart';
+
 class HomePage extends StatelessWidget {
-  const HomePage({super.key});
+   HomePage({
+     super.key,
+     this.title,
+     this.leadingIcon = 'assets/icons/Arrow - Left 2.svg',
+     this.trailingIcon = 'assets/icons/dots.svg',
+   });
+  final String? title;
+  final String? leadingIcon;
+  final String? trailingIcon;
+   List<TabItem> tabsTitle = [
+     TabItem(index: 0, title: '', count: 0),
+     TabItem(index: 1, title: 'All Tasks', count: 12),
+     TabItem(index: 3, title: '+ new task', count: 0),
+   ];
+   List<Widget> tabBarView = [
+     const Center(child: Text("Favorite Tasks")),
+     const Center(child: Text("All Tasks")),
+     const Center(child: Text("All Tasks")),
+   ];
+
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: appBar(),
-      backgroundColor: Colors.white,
-      body: Column(
-        children: [
-          _searchField(),
-        ],
+    return DefaultTabController(
+      initialIndex: 0,
+      length: tabsTitle.length,
+      child: Scaffold(
+        appBar: appBar(title: title, leadingIcon: leadingIcon, trailingIcon: trailingIcon),
+        backgroundColor: Colors.white,
+        body:  TabBarView(
+          children: tabBarView,
+        ),
       ),
     );
   }
@@ -72,10 +95,10 @@ class HomePage extends StatelessWidget {
         );
   }
 
-  AppBar appBar() {
+  AppBar appBar({String? title, String? leadingIcon, String? trailingIcon}) {
     return AppBar(
       title: Text(
-        'Tasks',
+        title ?? 'Tasks',
         style: TextStyle(
           color: Colors.black,
           fontSize: 18,
@@ -85,7 +108,7 @@ class HomePage extends StatelessWidget {
       centerTitle: true,
       backgroundColor: Colors.white,
       elevation: 0.0,
-      leading: GestureDetector(
+      leading: leadingIcon != null ? GestureDetector(
         onTap: () {},
         child: Container(
           margin: EdgeInsets.all(10),
@@ -95,31 +118,37 @@ class HomePage extends StatelessWidget {
             borderRadius: BorderRadius.circular(10),
           ),
           child: SvgPicture.asset(
-            'assets/icons/Arrow - Left 2.svg',
+            leadingIcon,
             height: 20,
             width: 20,
           ),
         ),
-      ),
+      ) : null,
       actions: [
-        GestureDetector(
-          onTap: () {},
-          child: Container(
-            margin: EdgeInsets.all(10),
-            alignment: Alignment.center,
-            width: 37,
-            decoration: BoxDecoration(
-              color: Color(0xffF7F8F8),
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: SvgPicture.asset(
-              'assets/icons/dots.svg',
-              height: 5,
-              width: 5,
+        if (trailingIcon != null)
+          GestureDetector(
+            onTap: () {},
+            child: Container(
+              margin: EdgeInsets.all(10),
+              alignment: Alignment.center,
+              width: 37,
+              decoration: BoxDecoration(
+                color: Colors.blue,
+                borderRadius: BorderRadius.circular(50),
+              ),
+              child: SvgPicture.asset(
+                trailingIcon,
+                height: 5,
+                width: 5,
+              ),
             ),
           ),
-        ),
       ],
+      bottom:  TabBar(
+        tabAlignment: TabAlignment.startOffset,
+        isScrollable: true,
+        tabs: tabsTitle
+      ),
     );
   }
 }
