@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 import '../widgets/tab_item.dart';
+import 'new_task_screen.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({
@@ -28,12 +29,10 @@ class _HomePageState extends State<HomePage> {
     super.initState();
     tabsTitle = [
       const TabItem(index: 0, title: '', count: 0),
-      const TabItem(index: 1, title: 'All Tasks', count: 12),
       const TabItem(index: 2, title: '+ new task', count: 0),
     ];
     tabBarView = [
       const Center(child: Text("Favorite Tasks")),
-      const Center(child: Text("All Tasks")),
       const Center(child: Text("Click + to add a task")),
     ];
   }
@@ -41,13 +40,14 @@ class _HomePageState extends State<HomePage> {
   void _addNewTask() {
     setState(() {
       int newIndex = tabsTitle.length - 1;
+      String taskName = 'Task ${tabsTitle.length}';
       tabsTitle.insert(
         newIndex,
-        TabItem(index: newIndex, title: 'Task ${tabsTitle.length}', count: 0),
+        TabItem(index: newIndex, title: taskName, count: 0),
       );
       tabBarView.insert(
         newIndex,
-        Center(child: Text("Content for Task ${tabsTitle.length - 1}")),
+        NewTaskScreen(taskName: taskName),
       );
     });
   }
@@ -137,3 +137,4 @@ class _HomePageState extends State<HomePage> {
     );
   }
 }
+
