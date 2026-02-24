@@ -23,6 +23,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   late List<TabItem> tabsTitle;
   late List<Widget> tabBarView;
+  int _selectedIndex = 0;
 
   @override
   void initState() {
@@ -49,6 +50,7 @@ class _HomePageState extends State<HomePage> {
         newIndex,
         NewTaskScreen(taskName: taskName),
       );
+      _selectedIndex = newIndex;
     });
   }
 
@@ -56,7 +58,7 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return DefaultTabController(
       key: ValueKey(tabsTitle.length),
-      initialIndex: 0,
+      initialIndex: _selectedIndex,
       length: tabsTitle.length,
       child: Scaffold(
         appBar: appBar(
@@ -66,6 +68,11 @@ class _HomePageState extends State<HomePage> {
         backgroundColor: Colors.white,
         body: TabBarView(
           children: tabBarView,
+        ),
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {},
+          backgroundColor: Colors.blue,
+          child: const Icon(Icons.add, color: Colors.white),
         ),
       ),
     );
@@ -126,6 +133,8 @@ class _HomePageState extends State<HomePage> {
         onTap: (index) {
           if (index == tabsTitle.length - 1) {
             _addNewTask();
+          } else {
+            _selectedIndex = index;
           }
         },
         tabAlignment: TabAlignment.start,
@@ -137,4 +146,3 @@ class _HomePageState extends State<HomePage> {
     );
   }
 }
-
