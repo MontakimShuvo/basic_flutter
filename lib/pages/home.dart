@@ -23,6 +23,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   late List<TabItem> tabsTitle;
   late List<Widget> tabBarView;
+  final List<GlobalKey<NewTaskScreenState>> _taskKeys = [];
   int _selectedIndex = 0;
 
   @override
@@ -42,13 +43,17 @@ class _HomePageState extends State<HomePage> {
     setState(() {
       int newIndex = tabsTitle.length - 1;
       String taskName = 'Task ${tabsTitle.length}';
+      
+      final key = GlobalKey<NewTaskScreenState>();
+      _taskKeys.add(key);
+
       tabsTitle.insert(
         newIndex,
         TabItem(index: newIndex, title: taskName, count: 0),
       );
       tabBarView.insert(
         newIndex,
-        NewTaskScreen(taskName: taskName),
+        NewTaskScreen(key: key, taskName: taskName),
       );
       _selectedIndex = newIndex;
     });
@@ -70,7 +75,12 @@ class _HomePageState extends State<HomePage> {
           children: tabBarView,
         ),
         floatingActionButton: FloatingActionButton(
-          onPressed: () {},
+          onPressed: () {
+            // Find the key for the current task screen and call addItem
+            if (_selectedIndex < _taskKeys.length) {
+               _taskKeys[_selectedIndex].currentState?.addItem();
+            }
+          },
           backgroundColor: Colors.blue,
           child: const Icon(Icons.add, color: Colors.white),
         ),
@@ -134,7 +144,9 @@ class _HomePageState extends State<HomePage> {
           if (index == tabsTitle.length - 1) {
             _addNewTask();
           } else {
-            _selectedIndex = index;
+            setState(() {
+              _selectedIndex = index;
+            });
           }
         },
         tabAlignment: TabAlignment.start,
