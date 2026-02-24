@@ -20,9 +20,10 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   late List<TabItem> tabsTitle;
   late List<Widget> tabBarView;
+  late TabController _tabController;
   final List<GlobalKey<NewTaskScreenState>> _taskKeys = [];
   int _selectedIndex = 0;
 
@@ -31,6 +32,7 @@ class _HomePageState extends State<HomePage> {
     super.initState();
     final key = GlobalKey<NewTaskScreenState>();
     _taskKeys.add(key);
+
     tabsTitle = [
       const TabItem(index: 0, title: '', count: 0),
       const TabItem(index: 1, title: '+ new task', count: 0),
@@ -40,13 +42,29 @@ class _HomePageState extends State<HomePage> {
       const Center(child: Text("Click + to add a task")),
     ];
 
+    _tabController = TabController(length: tabsTitle.length, vsync: this);
+    _tabController.addListener(_handleTabChange);
+  }
+
+  void _handleTabChange() {
+    if (_tabController.indexIsChanging) return;
+    setState(() {
+      _selectedIndex = _tabController.index;
+    });
+  }
+
+  @override
+  void dispose() {
+    _tabController.removeListener(_handleTabChange);
+    _tabController.dispose();
+    super.dispose();
   }
 
   void _addNewTask() {
     setState(() {
       int newIndex = tabsTitle.length - 1;
       String taskName = 'Task ${tabsTitle.length}';
-      
+
       final key = GlobalKey<NewTaskScreenState>();
       _taskKeys.add(key);
 
@@ -58,35 +76,40 @@ class _HomePageState extends State<HomePage> {
         newIndex,
         NewTaskScreen(key: key, taskName: taskName),
       );
+
+      // Dispose old controller and create a new one with updated length
+      _tabController.removeListener(_handleTabChange);
+      _tabController.dispose();
       _selectedIndex = newIndex;
+      _tabController = TabController(
+        length: tabsTitle.length,
+        vsync: this,
+        initialIndex: _selectedIndex,
+      );
+      _tabController.addListener(_handleTabChange);
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    return DefaultTabController(
-      key: ValueKey(tabsTitle.length),
-      initialIndex: _selectedIndex,
-      length: tabsTitle.length,
-      child: Scaffold(
-        appBar: appBar(
-            title: widget.title,
-            leadingIcon: widget.leadingIcon,
-            trailingIcon: widget.trailingIcon),
-        backgroundColor: Colors.white,
-        body: TabBarView(
-          children: tabBarView,
-        ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            // Find the key for the current task screen and call addItem
-            if (_selectedIndex < _taskKeys.length) {
-               _taskKeys[_selectedIndex].currentState?.addItem();
-            }
-          },
-          backgroundColor: Colors.blue,
-          child: const Icon(Icons.add, color: Colors.white),
-        ),
+    return Scaffold(
+      appBar: appBar(
+          title: widget.title,
+          leadingIcon: widget.leadingIcon,
+          trailingIcon: widget.trailingIcon),
+      backgroundColor: Colors.white,
+      body: TabBarView(
+        controller: _tabController,
+        children: tabBarView,
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          if (_selectedIndex < _taskKeys.length) {
+            _taskKeys[_selectedIndex].currentState?.addItem();
+          }
+        },
+        backgroundColor: Colors.blue,
+        child: const Icon(Icons.add, color: Colors.white),
       ),
     );
   }
@@ -143,13 +166,10 @@ class _HomePageState extends State<HomePage> {
           ),
       ],
       bottom: TabBar(
+        controller: _tabController,
         onTap: (index) {
           if (index == tabsTitle.length - 1) {
             _addNewTask();
-          } else {
-            setState(() {
-              _selectedIndex = index;
-            });
           }
         },
         tabAlignment: TabAlignment.start,
