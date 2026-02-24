@@ -29,14 +29,17 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
+    final key = GlobalKey<NewTaskScreenState>();
+    _taskKeys.add(key);
     tabsTitle = [
       const TabItem(index: 0, title: '', count: 0),
-      const TabItem(index: 2, title: '+ new task', count: 0),
+      const TabItem(index: 1, title: '+ new task', count: 0),
     ];
     tabBarView = [
-      const Center(child: Text("Favorite Tasks")),
+       NewTaskScreen(key: key, taskName: ""),
       const Center(child: Text("Click + to add a task")),
     ];
+
   }
 
   void _addNewTask() {

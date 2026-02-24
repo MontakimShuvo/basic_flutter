@@ -8,7 +8,7 @@ class NewTaskScreen extends StatefulWidget {
   State<NewTaskScreen> createState() => NewTaskScreenState();
 }
 
-class NewTaskScreenState extends State<NewTaskScreen> {
+class NewTaskScreenState extends State<NewTaskScreen> with AutomaticKeepAliveClientMixin {
   final List<String> items = [];
 
   void addItem() {
@@ -18,33 +18,13 @@ class NewTaskScreenState extends State<NewTaskScreen> {
   }
 
   @override
+  bool get wantKeepAlive => true;
+
+  @override
   Widget build(BuildContext context) {
+    super.build(context);
     return Column(
       children: [
-        Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Container(
-            width: double.infinity,
-            height: 100,
-            decoration: BoxDecoration(
-              color: Colors.green,
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(Icons.star, color: Colors.white, size: 30),
-                  const SizedBox(height: 5),
-                  Text(
-                    widget.taskName,
-                    style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
         Expanded(
           child: ListView.builder(
             itemCount: items.length,
