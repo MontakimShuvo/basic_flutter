@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
+import '../widgets/app_bar.dart';
 import '../widgets/tab_item.dart';
+import 'create_new_tab_screen.dart';
 import 'new_task_screen.dart';
 
 class HomePage extends StatefulWidget {
@@ -41,6 +43,13 @@ class _HomePageState extends State<HomePage> {
       NewTaskScreen(key: key, taskName: ""),
       const Center(child: Text("Click + to add a task")),
     ];
+  }
+  
+  void _gotoCreateTaskScreen(BuildContext context){
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const CreateNewTabScreen()),
+    );
   }
 
   void _addNewTask(BuildContext context) {
@@ -82,12 +91,14 @@ class _HomePageState extends State<HomePage> {
               title: widget.title,
               leadingIcon: widget.leadingIcon,
               trailingIcon: widget.trailingIcon,
+              tabsTitle: tabsTitle,
+              addNewTask: (ctx) => _gotoCreateTaskScreen(ctx),
             ),
             backgroundColor: Colors.white,
             body: TabBarView(children: tabBarView),
             floatingActionButton: FloatingActionButton(
               onPressed: () {
-                final index = controller?.index ?? 0;
+                final index = controller.index ?? 0;
                 if (index < _taskKeys.length) {
                   _taskKeys[index].currentState?.addItem();
                 }
@@ -101,74 +112,5 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  AppBar appBar({
-    required BuildContext context,
-    String? title,
-    String? leadingIcon,
-    String? trailingIcon,
-  }) {
-    return AppBar(
-      title: Text(
-        title ?? 'Tasks',
-        style: const TextStyle(
-          color: Colors.black,
-          fontSize: 18,
-          fontWeight: FontWeight.bold,
-        ),
-      ),
-      centerTitle: true,
-      backgroundColor: Colors.white,
-      elevation: 0.0,
-      leading: leadingIcon != null
-          ? GestureDetector(
-        onTap: () {},
-        child: Container(
-          margin: const EdgeInsets.all(10),
-          alignment: Alignment.center,
-          decoration: BoxDecoration(
-            color: const Color(0xffF7F8F8),
-            borderRadius: BorderRadius.circular(10),
-          ),
-          child: SvgPicture.asset(
-            leadingIcon,
-            height: 20,
-            width: 20,
-          ),
-        ),
-      )
-          : null,
-      actions: [
-        if (trailingIcon != null)
-          GestureDetector(
-            onTap: () {},
-            child: Container(
-              margin: const EdgeInsets.all(10),
-              alignment: Alignment.center,
-              width: 37,
-              decoration: BoxDecoration(
-                color: Colors.blue,
-                borderRadius: BorderRadius.circular(50),
-              ),
-              child: SvgPicture.asset(
-                trailingIcon,
-                height: 5,
-                width: 5,
-              ),
-            ),
-          ),
-      ],
-      bottom: TabBar(
-        isScrollable: true,
-        tabs: tabsTitle,
-        onTap: (index) {
-          if (index == tabsTitle.length - 1) {
-            _addNewTask(context);
-          }
-        },
-        tabAlignment: TabAlignment.start,
-        padding: EdgeInsets.zero,
-        labelPadding: const EdgeInsets.symmetric(horizontal: 16.0),
-      ),
-    );
-  }
+
 }
