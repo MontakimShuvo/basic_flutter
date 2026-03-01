@@ -10,6 +10,7 @@ AppBar appBar({
   List<Widget>? tabsTitle,
   bool? centerTitlePos,
   void Function(BuildContext)? leadingIconAction,
+  void Function(BuildContext)? actionNameAction,
   void Function(BuildContext)? addNewTask,
 }) {
   return AppBar(
@@ -56,14 +57,19 @@ AppBar appBar({
           ),
         ),
       if (actionName != null)
-        Padding(
-          padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
-          child: Text(
-            actionName ?? "",
-            style: TextStyle(
-              color: Colors.black.withOpacity(0.4),
-              fontSize: 16,
-              fontWeight: FontWeight.normal,
+        GestureDetector(
+          onTap: () {
+            actionNameAction?.call(context);
+          },
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
+            child: Text(
+              actionName,
+              style: const TextStyle(
+                color: Colors.blue,
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
         ),

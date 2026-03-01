@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
-Container searchField() {
+Container searchField({TextEditingController? controller}) {
   return Container(
     margin: const EdgeInsets.only(top: 40, left: 20, right: 20),
     decoration: BoxDecoration(
@@ -14,6 +13,8 @@ Container searchField() {
       ],
     ),
     child: TextField(
+      controller: controller,
+      autofocus: true,
       decoration: InputDecoration(
         filled: true,
         fillColor: Colors.white,

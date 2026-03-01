@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
+import '../controllers/home_controller.dart';
 import '../widgets/app_bar.dart';
-import '../widgets/tab_item.dart';
 import 'create_new_tab_screen.dart';
-import 'new_task_screen.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({
@@ -23,94 +21,58 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  late List<TabItem> tabsTitle;
-  late List<Widget> tabBarView;
-  final List<GlobalKey<NewTaskScreenState>> _taskKeys = [];
+  final HomeController _homeController = HomeController();
 
-  @override
-  void initState() {
-    super.initState();
-
-    final key = GlobalKey<NewTaskScreenState>();
-    _taskKeys.add(key);
-
-    tabsTitle = [
-      const TabItem(index: 0, title: '', count: 0),
-      const TabItem(index: 1, title: '+ new task', count: 0),
-    ];
-
-    tabBarView = [
-      NewTaskScreen(key: key, taskName: ""),
-      const Center(child: Text("Click + to add a task")),
-    ];
-  }
-  
-  void _gotoCreateTaskScreen(BuildContext context){
-    Navigator.push(
+  void _gotoCreateTaskScreen(BuildContext context) async {
+    final result = await Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => const CreateNewTabScreen()),
     );
-  }
 
-  void _addNewTask(BuildContext context) {
-    setState(() {
-      int newIndex = tabsTitle.length - 1;
-      String taskName = 'Task ${tabsTitle.length}';
-
-      final key = GlobalKey<NewTaskScreenState>();
-      _taskKeys.add(key);
-
-      tabsTitle.insert(
-        newIndex,
-        TabItem(index: newIndex, title: taskName, count: 0),
-      );
-
-      tabBarView.insert(
-        newIndex,
-        NewTaskScreen(key: key, taskName: taskName),
-      );
-    });
-
-    /// switch to new tab after build
-    Future.microtask(() {
-      DefaultTabController.of(context)?.animateTo(tabsTitle.length - 2);
-    });
+    if (result != null && result is String && context.mounted) {
+      _homeController.addNewTask(result);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    return DefaultTabController(
-      length: tabsTitle.length,
-      child: Builder(
-        builder: (context) {
-          final controller = DefaultTabController.of(context);
-
-          return Scaffold(
-            appBar: appBar(
-              context: context,
-              title: widget.title,
-              leadingIcon: widget.leadingIcon,
-              trailingIcon: widget.trailingIcon,
-              tabsTitle: tabsTitle,
-              addNewTask: (ctx) => _gotoCreateTaskScreen(ctx),
-            ),
-            backgroundColor: Colors.white,
-            body: TabBarView(children: tabBarView),
-            floatingActionButton: FloatingActionButton(
-              onPressed: () {
-                final index = controller.index ?? 0;
-                if (index < _taskKeys.length) {
-                  _taskKeys[index].currentState?.addItem();
-                }
-              },
-              backgroundColor: Colors.blue,
-              child: const Icon(Icons.add, color: Colors.white),
-            ),
-          );
-        },
-      ),
+    return ListenableBuilder(
+      listenable: _homeController,
+      builder: (context, child) {
+        return DefaultTabController(
+          key: ValueKey(_homeController.taskCount),
+          initialIndex: _homeController.taskCount - 1,
+          length: _homeController.tabsTitle.length,
+          child: Builder(
+            builder: (context) {
+              final controller = DefaultTabController.of(context);
+              
+              return Scaffold(
+                appBar: appBar(
+                  context: context,
+                  title: widget.title,
+                  leadingIcon: widget.leadingIcon,
+                  trailingIcon: widget.trailingIcon,
+                  tabsTitle: _homeController.tabsTitle,
+                  addNewTask: (ctx) => _gotoCreateTaskScreen(ctx),
+                ),
+                backgroundColor: Colors.white,
+                body: TabBarView(children: _homeController.tabBarView),
+                floatingActionButton: FloatingActionButton(
+                  onPressed: () {
+                    final index = controller.index;
+                    if (index < _homeController.taskControllers.length) {
+                      _homeController.taskControllers[index].addItem();
+                    }
+                  },
+                  backgroundColor: Colors.blue,
+                  child: const Icon(Icons.add, color: Colors.white),
+                ),
+              );
+            },
+          ),
+        );
+      },
     );
   }
-
-
 }
