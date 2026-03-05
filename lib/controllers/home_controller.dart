@@ -62,7 +62,7 @@ class HomeController extends ChangeNotifier {
       ));
     }
     // Add the "+ new task" tab at the end
-    titles.add(TabItem(index: taskControllers.length, title: '+ new task', count: 0));
+    titles.add(TabItem(index: taskControllers.length, title: '+ new list', count: 0));
     return titles;
   }
 
