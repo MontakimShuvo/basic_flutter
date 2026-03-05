@@ -24,6 +24,10 @@ class _HomePageState extends State<HomePage> {
   final HomeController _homeController = HomeController();
 
   void _gotoCreateTaskScreen(BuildContext context) async {
+    // Get the current TabController to remember the active index
+    final controller = DefaultTabController.of(context);
+    final previousIndex = controller.index-1;
+
     final result = await Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => const CreateNewTabScreen()),
@@ -31,6 +35,9 @@ class _HomePageState extends State<HomePage> {
 
     if (result != null && result is String && context.mounted) {
       _homeController.addNewTask(result);
+    } else {
+      // If no task was created, animate back to the previous tab
+      controller.animateTo(previousIndex);
     }
   }
 
@@ -41,7 +48,7 @@ class _HomePageState extends State<HomePage> {
       builder: (context, child) {
         return DefaultTabController(
           key: ValueKey(_homeController.taskCount),
-          initialIndex: _homeController.taskCount - 1,
+          initialIndex: (_homeController.taskCount - 1).clamp(0, 1000),
           length: _homeController.tabsTitle.length,
           child: Builder(
             builder: (context) {
