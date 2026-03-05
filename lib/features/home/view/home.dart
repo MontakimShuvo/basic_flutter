@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
-import '../controllers/home_controller.dart';
-import '../widgets/app_bar.dart';
-import 'create_new_tab_screen.dart';
+import '../controller/home_controller.dart';
+import '../../../widgets/app_bar.dart';
+import '../../new_tab_screen/create_new_tab_screen.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({

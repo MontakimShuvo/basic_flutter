@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../widgets/app_bar.dart';
-import '../widgets/input_text_field.dart';
+import '../../widgets/app_bar.dart';
+import '../../widgets/input_text_field.dart';
 
 class CreateNewTabScreen extends StatefulWidget {
   const CreateNewTabScreen({super.key});

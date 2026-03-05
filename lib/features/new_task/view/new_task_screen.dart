@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../controllers/new_task_controller.dart';
+import '../controller/new_task_controller.dart';
 
 class NewTaskScreen extends StatelessWidget {
   final NewTaskController controller;
@@ -16,8 +16,9 @@ class NewTaskScreen extends StatelessWidget {
               child: ListView.builder(
                 itemCount: controller.items.length,
                 itemBuilder: (context, index) {
+                  final task = controller.items[index];
                   return ListTile(
-                    title: Text(controller.items[index]),
+                    title: Text(task['title']),
                     leading: const Icon(Icons.label),
                   );
                 },
