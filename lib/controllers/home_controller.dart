@@ -1,17 +1,52 @@
 import 'package:flutter/material.dart';
+import '../services/database_service.dart';
 import '../pages/new_task_screen.dart';
 import '../widgets/tab_item.dart';
 import 'new_task_controller.dart';
 
 class HomeController extends ChangeNotifier {
   final List<NewTaskController> taskControllers = [];
+  final DatabaseService _dbService = DatabaseService();
 
   HomeController() {
-    taskControllers.add(NewTaskController(taskName: "Favorites"));
+    _loadTaskLists();
   }
 
-  void addNewTask(String taskName) {
-    taskControllers.add(NewTaskController(taskName: taskName));
+  // Load existing lists from DB on startup
+  Future<void> _loadTaskLists() async {
+    final lists = await _dbService.getTaskLists();
+    if (lists.isEmpty) {
+      // Create default Favorites if DB is empty
+      await addNewTask("Favorites");
+    } else {
+      taskControllers.clear();
+      for (var list in lists) {
+        taskControllers.add(NewTaskController(
+          id: list['id'],
+          taskName: list['name'],
+        ));
+      }
+      notifyListeners();
+    }
+  }
+
+  Future<void> addNewTask(String taskName) async {
+    // 1. Prepare data for SQLite
+    final newList = {
+      'name': taskName,
+      'position': taskControllers.length,
+      'created_at': DateTime.now().millisecondsSinceEpoch,
+    };
+
+    // 2. Perform DB Operation: INSERT
+    final id = await _dbService.createTaskList(newList);
+
+    // 3. Update local state
+    taskControllers.add(NewTaskController(
+      id: id,
+      taskName: taskName,
+    ));
+
     notifyListeners();
   }
 

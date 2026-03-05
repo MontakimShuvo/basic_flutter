@@ -63,7 +63,6 @@ class DatabaseService {
     ''');
   }
 
-  // --- Task List CRUD ---
 
   Future<int> createTaskList(Map<String, dynamic> row) async {
     Database db = await database;
@@ -94,7 +93,6 @@ class DatabaseService {
     );
   }
 
-  // --- Tasks CRUD ---
 
   Future<int> createTask(Map<String, dynamic> row) async {
     Database db = await database;
