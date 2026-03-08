@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../constants/app_constants.dart';
 import '../../../../constants/app_edge_insets.dart';
 import '../../../../utils/size_config.dart';
+import '../../../../widgets/calendar_widget/task_calendar_sheet.dart';
 import '../../../../widgets/text_field/common_input_field.dart';
 import '../../controller/home_controller.dart';
 
@@ -33,12 +34,12 @@ class _TaskInfoState extends State<TaskInfo> {
     SizeConfig().init(context);
     return Container(
       padding: AppEdgeInsets.defaultPagePadding,
-      height: SizeConfig.screenHeight * AppConstants.percentSkt20,
+      height: SizeConfig.screenHeight * AppConstants.percent20,
       child: Column(
         children: [
           CommonInputField(
             controller: widget.homeController.taskTitleController,
-            height: AppConstants.valueDoubleSkt40,
+            height: AppConstants.valueDouble40,
             hintText: 'New Task',
             autofocus: true,
           ),
@@ -46,10 +47,10 @@ class _TaskInfoState extends State<TaskInfo> {
             CommonInputField(
               controller: widget.homeController.taskDetailsController,
               focusNode: _detailsFocusNode,
-              height: AppConstants.valueDoubleSkt30,
+              height: AppConstants.valueDouble30,
               hintText: 'Add Details',
               hintStyle: TextStyle(
-                fontSize: AppConstants.valueDoubleSkt14,
+                fontSize: AppConstants.valueDouble14,
                 color: Colors.black54,
               ),
             ),
@@ -64,18 +65,18 @@ class _TaskInfoState extends State<TaskInfo> {
                 },
                 child: Image.asset(
                   'assets/icons/ic_menu.png',
-                  width: AppConstants.valueDoubleSkt24,
-                  height: AppConstants.valueDoubleSkt24,
+                  width: AppConstants.valueDouble24,
+                  height: AppConstants.valueDouble24,
                 ),
               ),
               GestureDetector(
                 onTap: () {
-                  _selectDate();
+                  openTaskCalendar(context);
                 },
                 child: Image.asset(
                   'assets/icons/ic_clock.png',
-                  width: AppConstants.valueDoubleSkt24,
-                  height: AppConstants.valueDoubleSkt24,
+                  width: AppConstants.valueDouble24,
+                  height: AppConstants.valueDouble24,
                 ),
               ),
             ],
@@ -85,12 +86,12 @@ class _TaskInfoState extends State<TaskInfo> {
     );
   }
 
-  Future<void> _selectDate() async{
-    await showDatePicker(
-        context: context,
-        initialDate: DateTime.now(),
-        firstDate: DateTime(2000),
-        lastDate: DateTime(2100)
+  void openTaskCalendar(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => const TaskCalendarSheet(),
     );
   }
 }
