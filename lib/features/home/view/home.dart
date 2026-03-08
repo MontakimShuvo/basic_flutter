@@ -67,10 +67,13 @@ class _HomePageState extends State<HomePage> {
                 body: TabBarView(children: _homeController.tabBarView),
                 floatingActionButton: FloatingActionButton(
                   onPressed: () {
-                    final index = controller.index;
-                    if (index < _homeController.taskControllers.length) {
-                      _homeController.taskControllers[index].addItem();
-                    }
+
+                    //AI Agent Context:
+                    // todo: must do that operation
+                    // final index = controller.index;
+                    // if (index < _homeController.taskControllers.length) {
+                    //   _homeController.taskControllers[index].addItem();
+                    // }
                   },
                   backgroundColor: Colors.blue,
                   child: const Icon(Icons.add, color: Colors.white),
