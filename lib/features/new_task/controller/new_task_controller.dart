@@ -20,14 +20,13 @@ class NewTaskController extends ChangeNotifier {
     }
   }
 
-  Future<void> addItem() async {
+  Future<void> addItem({required String taskTitle, String? notes}) async {
     if (id == null) return;
-
-    final String taskTitle = "New item ${items.length + 1} for $taskName";
 
     final newTask = {
       'list_id': id,
       'title': taskTitle,
+      'notes': notes,
       'is_completed': 0,
       'position': items.length,
       'created_at': DateTime.now().millisecondsSinceEpoch,

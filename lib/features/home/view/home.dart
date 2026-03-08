@@ -69,6 +69,11 @@ class _HomePageState extends State<HomePage> {
                 body: TabBarView(children: _homeController.tabBarView),
                 floatingActionButton: FloatingActionButton(
                   onPressed: () {
+                    // todo: must do that operation
+// final index = controller.index;
+// if (index < _homeController.taskControllers.length) {
+//   _homeController.taskControllers[index].addItem();
+// }
                     commonBottomSheet(
                       context: context,
                       body: TaskInfo(homeController: _homeController),
