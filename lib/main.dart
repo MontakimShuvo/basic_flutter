@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:untitled/features/home/view/home.dart';
-import 'package:untitled/features/new_task/view/widget/task_card_container.dart';
+import 'package:untitled/utils/size_config.dart';
 
 void main() {
   runApp(const MyApp());
@@ -12,6 +12,7 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+    SizeConfig().init(context);
     return  MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: ThemeData(fontFamily: 'Poppins'),
