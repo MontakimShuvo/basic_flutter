@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import '../controller/home_controller.dart';
 import '../../../widgets/app_bar.dart';
 import '../../new_tab_screen/create_new_tab_screen.dart';
+import '../../../utils/bottom_sheet/common_bottom_sheet.dart';
+import 'widget/task_info.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({
@@ -67,13 +69,10 @@ class _HomePageState extends State<HomePage> {
                 body: TabBarView(children: _homeController.tabBarView),
                 floatingActionButton: FloatingActionButton(
                   onPressed: () {
-
-                    //AI Agent Context:
-                    // todo: must do that operation
-                    // final index = controller.index;
-                    // if (index < _homeController.taskControllers.length) {
-                    //   _homeController.taskControllers[index].addItem();
-                    // }
+                    commonBottomSheet(
+                      context: context,
+                      body: TaskInfo(homeController: _homeController),
+                    );
                   },
                   backgroundColor: Colors.blue,
                   child: const Icon(Icons.add, color: Colors.white),

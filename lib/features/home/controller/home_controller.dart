@@ -8,6 +8,9 @@ class HomeController extends ChangeNotifier {
   final List<NewTaskController> taskControllers = [];
   final DatabaseService _dbService = DatabaseService();
 
+  var taskTitleController = TextEditingController();
+  var taskDetailsController = TextEditingController();
+
   HomeController() {
     _loadTaskLists();
   }
