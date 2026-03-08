@@ -93,6 +93,9 @@ class CommonInputField extends TextFormField{
           fillColor: fillColor,
           prefix: prefix,
           suffix: suffix,
+          border: InputBorder.none,
+          enabledBorder: InputBorder.none,
+          focusedBorder: InputBorder.none,
           contentPadding: contentPadding ??
               EdgeInsets.symmetric(horizontal: 12, vertical: 15),
         ),
