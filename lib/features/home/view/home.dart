@@ -69,14 +69,26 @@ class _HomePageState extends State<HomePage> {
                 body: TabBarView(children: _homeController.tabBarView),
                 floatingActionButton: FloatingActionButton(
                   onPressed: () {
-                    // todo: must do that operation
-// final index = controller.index;
-// if (index < _homeController.taskControllers.length) {
-//   _homeController.taskControllers[index].addItem();
-// }
                     commonBottomSheet(
                       context: context,
-                      body: TaskInfo(homeController: _homeController),
+                      body: TaskInfo(
+                        homeController: _homeController,
+                        onDone: (title, details, date) {
+                          if (title.isNotEmpty) {
+                            final index = controller.index;
+                            if (index < _homeController.taskControllers.length) {
+                              _homeController.taskControllers[index].addItem(
+                                taskTitle: title,
+                                notes: details,
+                                dueDate: date,
+                              );
+                              _homeController.taskTitleController.clear();
+                              _homeController.taskDetailsController.clear();
+                              Navigator.pop(context);
+                            }
+                          }
+                        },
+                      ),
                     );
                   },
                   backgroundColor: Colors.blue,

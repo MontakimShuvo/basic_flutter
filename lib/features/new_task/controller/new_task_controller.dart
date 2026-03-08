@@ -20,13 +20,14 @@ class NewTaskController extends ChangeNotifier {
     }
   }
 
-  Future<void> addItem({required String taskTitle, String? notes}) async {
+  Future<void> addItem({required String taskTitle, String? notes, DateTime? dueDate}) async {
     if (id == null) return;
 
     final newTask = {
       'list_id': id,
       'title': taskTitle,
       'notes': notes,
+      'due_date': dueDate?.millisecondsSinceEpoch,
       'is_completed': 0,
       'position': items.length,
       'created_at': DateTime.now().millisecondsSinceEpoch,
