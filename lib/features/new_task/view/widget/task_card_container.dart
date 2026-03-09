@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:untitled/constants/app_constants.dart';
+import 'package:untitled/features/task_details/view/task_details_screen.dart';
 
 class TaskCardContainer extends StatelessWidget {
   final String title;
@@ -63,60 +64,69 @@ class TaskCardContainer extends StatelessWidget {
                 const SizedBox(height: 12),
                 Column(
                   children: tasks.map((task) {
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(
-                        vertical: AppConstants.valueDouble8,
-                      ),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Icon(
-                            task['is_completed'] == 1
-                                ? Icons.check_circle
-                                : Icons.radio_button_unchecked,
-                            color: task['is_completed'] == 1
-                                ? Colors.green
-                                : Colors.grey,
-                          ),
-                          const SizedBox(width: AppConstants.valueDouble12),
+                    return GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const TaskDetailsScreen()),
+                        );
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                          vertical: AppConstants.valueDouble8,
+                        ),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Icon(
+                              task['is_completed'] == 1
+                                  ? Icons.check_circle
+                                  : Icons.radio_button_unchecked,
+                              color: task['is_completed'] == 1
+                                  ? Colors.green
+                                  : Colors.grey,
+                            ),
+                            const SizedBox(width: AppConstants.valueDouble12),
 
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  task['title'] ?? '',
-                                  style: TextStyle(
-                                    fontSize: AppConstants.valueDouble16,
-                                    decoration: task['is_completed'] == 1
-                                        ? TextDecoration.lineThrough
-                                        : null,
-                                    color: task['is_completed'] == 1
-                                        ? Colors.grey
-                                        : Colors.black,
-
-                                  ),
-                                ),
-
-                                Text(
-                                  task['notes'] ?? '',
-                                  style: TextStyle(
-                                    fontSize: AppConstants.valueDouble12,
-                                  ),
-                                ),
-                                if (task['due_date'] != null)
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
                                   Text(
-                                    DateFormat('EEEE, MMM d, h:mm a').format(
-                                        DateTime.fromMillisecondsSinceEpoch(
-                                            task['due_date'])),
+                                    task['title'] ?? '',
+                                    style: TextStyle(
+                                      fontSize: AppConstants.valueDouble16,
+                                      decoration: task['is_completed'] == 1
+                                          ? TextDecoration.lineThrough
+                                          : null,
+                                      color: task['is_completed'] == 1
+                                          ? Colors.grey
+                                          : Colors.black,
+
+                                    ),
+                                  ),
+
+                                  Text(
+                                    task['notes'] ?? '',
                                     style: TextStyle(
                                       fontSize: AppConstants.valueDouble12,
                                     ),
                                   ),
-                              ],
+                                  if (task['due_date'] != null)
+                                    Text(
+                                      DateFormat('EEEE, MMM d, h:mm a').format(
+                                          DateTime.fromMillisecondsSinceEpoch(
+                                              task['due_date'])),
+                                      style: TextStyle(
+                                        fontSize: AppConstants.valueDouble12,
+                                      ),
+                                    ),
+                                ],
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     );
                   }).toList(),
