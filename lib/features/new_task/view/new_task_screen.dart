@@ -11,7 +11,7 @@ class NewTaskScreen extends StatelessWidget {
     return ListenableBuilder(
       listenable: controller,
       builder: (context, child) {
-        return TaskCardContainer(tasks: controller.items);
+        return TaskCardContainer(title:controller.taskName,tasks: controller.items);
       },
     );
   }
