@@ -12,10 +12,10 @@ class TaskCalendarSheet extends StatefulWidget {
 class _TaskCalendarSheetState extends State<TaskCalendarSheet> {
   DateTime focusedDay = DateTime.now();
   DateTime? selectedDay;
+  TimeOfDay? selectedTime;
 
   @override
   void initState() {
-    // TODO: implement initState
     selectedDay = DateTime.now();
     super.initState();
   }
@@ -36,7 +36,7 @@ class _TaskCalendarSheetState extends State<TaskCalendarSheet> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Padding(
-              padding: const EdgeInsets.only(top: 12,right: 12,left:12,bottom: 12),
+              padding: const EdgeInsets.only(top: 12, right: 12, left: 12, bottom: 12),
               child: TableCalendar(
                 focusedDay: focusedDay,
                 firstDay: DateTime.utc(2020),
@@ -70,22 +70,20 @@ class _TaskCalendarSheetState extends State<TaskCalendarSheet> {
               ),
             ),
             const Divider(height: AppConstants.valueDouble1),
-      
             ListTile(
               leading: const Icon(Icons.access_time),
-              title: const Text("Set time"),
-              onTap: () {},
+              title: Text(selectedTime == null ? "Set time" : selectedTime!.format(context)),
+              onTap: () {
+                openTimePicker();
+              },
             ),
-      
             const Divider(height: AppConstants.valueDouble1),
-      
             ListTile(
               leading: const Icon(Icons.repeat),
               title: const Text("Repeat"),
               onTap: () {},
             ),
             const Divider(),
-      
             Padding(
               padding: EdgeInsets.symmetric(
                 horizontal: AppConstants.valueDouble16,
@@ -100,12 +98,24 @@ class _TaskCalendarSheetState extends State<TaskCalendarSheet> {
                     },
                     child: const Text('Cancel'),
                   ),
-      
                   const SizedBox(width: AppConstants.valueDouble15),
-      
                   TextButton(
                     onPressed: () {
-                      Navigator.pop(context, selectedDay);
+                      if (selectedDay != null) {
+                        DateTime resultDate = selectedDay!;
+                        if (selectedTime != null) {
+                          resultDate = DateTime(
+                            resultDate.year,
+                            resultDate.month,
+                            resultDate.day,
+                            selectedTime!.hour,
+                            selectedTime!.minute,
+                          );
+                        }
+                        Navigator.pop(context, resultDate);
+                      } else {
+                        Navigator.pop(context);
+                      }
                     },
                     child: const Text("Done"),
                   ),
@@ -117,4 +127,51 @@ class _TaskCalendarSheetState extends State<TaskCalendarSheet> {
       ),
     );
   }
+
+  Future<void> openTimePicker() async {
+    final TimeOfDay? picked = await showTimePicker(
+      context: context,
+      initialTime: selectedTime ?? const TimeOfDay(hour: 11, minute: 0),
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: const ColorScheme.light(
+              primary: Color(0xff5c6bc0), // clock hand
+              onPrimary: Colors.grey,
+            ),
+
+            timePickerTheme: TimePickerThemeData(
+              backgroundColor: Colors.white,
+
+              hourMinuteShape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(14),
+              ),
+
+              dayPeriodShape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
+
+              dayPeriodColor: Colors.grey.shade200,
+
+              dayPeriodTextColor: Colors.black,
+
+              dialHandColor: const Color(0xff5c6bc0),
+
+              dialBackgroundColor: Colors.grey.shade100,
+
+              dialTextColor: Colors.black,
+            ),
+          ),
+          child: child!,
+        );
+      },
+    );
+
+    if (picked != null) {
+      setState(() {
+        selectedTime = picked;
+      });
+    }
+  }
+
 }
