@@ -1,22 +1,44 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:untitled/constants/app_constants.dart';
+import '../../../widgets/text_field/common_input_field.dart';
 import '../../../utils/size_config.dart';
 
-class TaskDetailsScreen extends StatelessWidget {
+class TaskDetailsScreen extends StatefulWidget {
   final Map<String, dynamic> task;
 
   const TaskDetailsScreen({super.key, required this.task});
 
   @override
+  State<TaskDetailsScreen> createState() => _TaskDetailsScreenState();
+}
+
+class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
+  late TextEditingController _notesController;
+
+  @override
+  void initState() {
+    super.initState();
+    _notesController = TextEditingController(text: widget.task['notes']);
+  }
+
+  @override
+  void dispose() {
+    _notesController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     SizeConfig().init(context);
-    final String title = task['title'] ?? 'No title';
-    final String notes = task['notes'] ?? 'No notes';
-    final int? dueDateMillis = task['due_date'];
+    final String title = widget.task['title'] ?? 'No title';
+    final int? dueDateMillis = widget.task['due_date'];
+    final int? createAtMillis = widget.task['created_at'];
     final String dueDate = dueDateMillis != null 
         ? DateFormat('EEE, MMM d').format(DateTime.fromMillisecondsSinceEpoch(dueDateMillis))
         : 'Set due date';
+
+    final String createAtDate = createAtMillis != null ? DateFormat('EEE, MMM d').format(DateTime.fromMillisecondsSinceEpoch(createAtMillis)) : '';
 
     return Scaffold(
       floatingActionButton: Container(
@@ -93,13 +115,16 @@ class TaskDetailsScreen extends StatelessWidget {
                       ),
                       const SizedBox(height: AppConstants.valueDouble20),
                       Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           const Icon(Icons.notes_outlined),
                           const SizedBox(width: AppConstants.valueDouble12),
                           Expanded(
-                            child: Text(
-                              notes,
+                            child: CommonInputField(
+                              controller: _notesController,
+                              hintText: "Add description",
+                              maxLines: null,
                               style: const TextStyle(fontSize: 16),
                             ),
                           )
@@ -118,7 +143,7 @@ class TaskDetailsScreen extends StatelessWidget {
                         children: [
                           const Icon(Icons.access_time),
                           const SizedBox(width: AppConstants.valueDouble12),
-                          chip(dueDate),
+                          chip(createAtDate),
                         ],
                       ),
                       const SizedBox(height: AppConstants.valueDouble25),

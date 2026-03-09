@@ -69,7 +69,7 @@ class TaskCardContainer extends StatelessWidget {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => const TaskDetailsScreen()),
+                              builder: (context) => TaskDetailsScreen(task: task)),
                         );
                       },
                       child: Padding(
