@@ -1,14 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:untitled/constants/app_constants.dart';
-
 import '../../../utils/size_config.dart';
 
 class TaskDetailsScreen extends StatelessWidget {
-  const TaskDetailsScreen({super.key});
+  final Map<String, dynamic> task;
+
+  const TaskDetailsScreen({super.key, required this.task});
 
   @override
   Widget build(BuildContext context) {
     SizeConfig().init(context);
+    final String title = task['title'] ?? 'No title';
+    final String notes = task['notes'] ?? 'No notes';
+    final int? dueDateMillis = task['due_date'];
+    final String dueDate = dueDateMillis != null 
+        ? DateFormat('EEE, MMM d').format(DateTime.fromMillisecondsSinceEpoch(dueDateMillis))
+        : 'Set due date';
+
     return Scaffold(
       floatingActionButton: Container(
         width: 190,
@@ -24,7 +33,6 @@ class TaskDetailsScreen extends StatelessWidget {
           ),
         ),
       ),
-
       body: SafeArea(
         child: Container(
           height: SizeConfig.screenHeight * AppConstants.percent80,
@@ -38,10 +46,13 @@ class TaskDetailsScreen extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: AppConstants.valueDouble12),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: const [
-                    Icon(Icons.arrow_back),
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.arrow_back),
+                      onPressed: () => Navigator.pop(context),
+                    ),
                     Row(
-                      children: [
+                      children: const [
                         Icon(Icons.star_border),
                         SizedBox(width: AppConstants.valueDouble16),
                         Icon(Icons.more_vert),
@@ -50,19 +61,14 @@ class TaskDetailsScreen extends StatelessWidget {
                   ],
                 ),
               ),
-
               const SizedBox(height: AppConstants.valueDouble20),
-
-              /// Main card
               Expanded(
                 child: Container(
                   margin: const EdgeInsets.symmetric(horizontal: AppConstants.valueDouble12),
                   padding: const EdgeInsets.all(AppConstants.valueDouble20),
-
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-
                       Row(
                         children: const [
                           Text(
@@ -77,59 +83,45 @@ class TaskDetailsScreen extends StatelessWidget {
                           Icon(Icons.arrow_drop_down)
                         ],
                       ),
-
                       const SizedBox(height: AppConstants.valueDouble25),
-
-                      const TextField(
-                        decoration: InputDecoration(
-                          hintText: "Task title",
-                          border: InputBorder.none,
-                        ),
-                        style: TextStyle(
+                      Text(
+                        title,
+                        style: const TextStyle(
                           fontSize: AppConstants.valueDouble28,
                           fontWeight: FontWeight.w500,
                         ),
                       ),
-
                       const SizedBox(height: AppConstants.valueDouble20),
-
                       Row(
-                        children: const [
-                          Icon(Icons.notes_outlined),
-                          SizedBox(width: AppConstants.valueDouble12),
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Icon(Icons.notes_outlined),
+                          const SizedBox(width: AppConstants.valueDouble12),
                           Expanded(
-                            child: TextField(
-                              decoration: InputDecoration(
-                                hintText: "Add description",
-                                border: InputBorder.none,
-                              ),
+                            child: Text(
+                              notes,
+                              style: const TextStyle(fontSize: 16),
                             ),
                           )
                         ],
                       ),
-
                       const SizedBox(height: AppConstants.valueDouble20),
-
                       Row(
                         children: [
                           const Icon(Icons.adjust),
                           const SizedBox(width: AppConstants.valueDouble12),
-                          chip("Due Thu, Mar 12"),
+                          chip("Due $dueDate"),
                         ],
                       ),
-
                       const SizedBox(height: AppConstants.valueDouble12),
-
                       Row(
                         children: [
                           const Icon(Icons.access_time),
                           const SizedBox(width: AppConstants.valueDouble12),
-                          chip("Mon, Mar 9"),
+                          chip(dueDate),
                         ],
                       ),
-
                       const SizedBox(height: AppConstants.valueDouble25),
-
                       Row(
                         children: const [
                           Icon(Icons.subdirectory_arrow_right),
