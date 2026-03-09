@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:untitled/constants/app_constants.dart';
+import '../../../widgets/calendar_widget/task_calendar_sheet.dart';
 import '../../../widgets/text_field/common_input_field.dart';
 import '../../../utils/size_config.dart';
 
@@ -15,11 +16,15 @@ class TaskDetailsScreen extends StatefulWidget {
 
 class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
   late TextEditingController _notesController;
+  DateTime? _selectedDueDate;
 
   @override
   void initState() {
     super.initState();
     _notesController = TextEditingController(text: widget.task['notes']);
+    if (widget.task['due_date'] != null) {
+      _selectedDueDate = DateTime.fromMillisecondsSinceEpoch(widget.task['due_date']);
+    }
   }
 
   @override
@@ -28,17 +33,33 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
     super.dispose();
   }
 
+  void _openTaskCalendar(BuildContext context) async {
+    final result = await showModalBottomSheet<DateTime>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => const TaskCalendarSheet(),
+    );
+
+    if (result != null) {
+      setState(() {
+        _selectedDueDate = result;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     SizeConfig().init(context);
     final String title = widget.task['title'] ?? 'No title';
-    final int? dueDateMillis = widget.task['due_date'];
     final int? createAtMillis = widget.task['created_at'];
-    final String dueDate = dueDateMillis != null 
-        ? DateFormat('EEE, MMM d').format(DateTime.fromMillisecondsSinceEpoch(dueDateMillis))
+    final String dueDateDisplay = _selectedDueDate != null
+        ? DateFormat('EEE, MMM d, h:mm a').format(_selectedDueDate!)
         : 'Set due date';
 
-    final String createAtDate = createAtMillis != null ? DateFormat('EEE, MMM d').format(DateTime.fromMillisecondsSinceEpoch(createAtMillis)) : '';
+    final String createAtDate = createAtMillis != null
+        ? DateFormat('EEE, MMM d').format(DateTime.fromMillisecondsSinceEpoch(createAtMillis))
+        : '';
 
     return Scaffold(
       floatingActionButton: Container(
@@ -131,14 +152,20 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
                         ],
                       ),
                       const SizedBox(height: AppConstants.valueDouble20),
-                      Row(
-                        children: [
-                          const Icon(Icons.adjust),
-                          const SizedBox(width: AppConstants.valueDouble12),
-                          chip("Due $dueDate"),
-                        ],
+
+                      GestureDetector(
+                          onTap: () => _openTaskCalendar(context),
+                          child:   Row(
+                            children: [
+                              const Icon(Icons.adjust),
+                              const SizedBox(width: AppConstants.valueDouble12),
+                              chip("Due $dueDateDisplay"),
+                            ],
+                          ),
                       ),
+
                       const SizedBox(height: AppConstants.valueDouble12),
+
                       Row(
                         children: [
                           const Icon(Icons.access_time),
