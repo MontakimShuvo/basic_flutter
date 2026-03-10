@@ -1,16 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:untitled/constants/app_constants.dart';
+import 'package:untitled/features/new_task/controller/new_task_controller.dart';
 import 'package:untitled/features/task_details/view/task_details_screen.dart';
 
 class TaskCardContainer extends StatelessWidget {
   final String title;
   final List<Map<String, dynamic>> tasks;
+  final NewTaskController controller;
 
   const TaskCardContainer({
     super.key,
     required this.title,
     required this.tasks,
+    required this.controller,
   });
 
   @override
@@ -65,12 +68,13 @@ class TaskCardContainer extends StatelessWidget {
                 Column(
                   children: tasks.map((task) {
                     return GestureDetector(
-                      onTap: () {
-                        Navigator.push(
+                      onTap: () async {
+                        await Navigator.push(
                           context,
                           MaterialPageRoute(
                               builder: (context) => TaskDetailsScreen(task: task)),
                         );
+                        controller.loadTasks();
                       },
                       child: Padding(
                         padding: const EdgeInsets.symmetric(

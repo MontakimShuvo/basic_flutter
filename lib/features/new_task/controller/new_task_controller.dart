@@ -8,10 +8,10 @@ class NewTaskController extends ChangeNotifier {
   final DatabaseService _dbService = DatabaseService();
 
   NewTaskController({this.id, required this.taskName}) {
-    _loadTasks();
+    loadTasks();
   }
 
-  Future<void> _loadTasks() async {
+  Future<void> loadTasks() async {
     if (id != null) {
       final tasks = await _dbService.getTasksByListId(id!);
       items.clear();

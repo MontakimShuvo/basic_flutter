@@ -55,7 +55,7 @@ class _HomePageState extends State<HomePage> {
           child: Builder(
             builder: (context) {
               final controller = DefaultTabController.of(context);
-              
+
               return Scaffold(
                 appBar: appBar(
                   context: context,
