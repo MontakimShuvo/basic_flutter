@@ -5,6 +5,7 @@ import '../../../widgets/calendar_widget/task_calendar_sheet.dart';
 import '../../../widgets/text_field/common_input_field.dart';
 import '../../../utils/size_config.dart';
 import '../controller/task_details_controller.dart';
+import 'widget/subtask_tile.dart';
 
 class TaskDetailsScreen extends StatefulWidget {
   final Map<String, dynamic> task;
@@ -122,94 +123,109 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
                     ),
                     const SizedBox(height: AppConstants.valueDouble20),
                     Expanded(
-                      child: Container(
-                        margin: const EdgeInsets.symmetric(
+                      child: SingleChildScrollView(
+                        padding: const EdgeInsets.symmetric(
                           horizontal: AppConstants.valueDouble12,
                         ),
-                        padding: const EdgeInsets.all(
-                          AppConstants.valueDouble20,
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              children: const [
-                                Text(
-                                  "My Tasks",
-                                  style: TextStyle(
-                                    fontSize: AppConstants.valueDouble18,
-                                    fontWeight: FontWeight.w500,
-                                    color: Color(0xff5c6bc0),
+                        child: Container(
+                          padding: const EdgeInsets.all(
+                            AppConstants.valueDouble20,
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: const [
+                                  Text(
+                                    "My Tasks",
+                                    style: TextStyle(
+                                      fontSize: AppConstants.valueDouble18,
+                                      fontWeight: FontWeight.w500,
+                                      color: Color(0xff5c6bc0),
+                                    ),
                                   ),
-                                ),
-                                SizedBox(width: AppConstants.valueDouble6),
-                                Icon(Icons.arrow_drop_down),
-                              ],
-                            ),
-                            const SizedBox(height: AppConstants.valueDouble25),
-                            Text(
-                              title,
-                              style: const TextStyle(
-                                fontSize: AppConstants.valueDouble28,
-                                fontWeight: FontWeight.w500,
+                                  SizedBox(width: AppConstants.valueDouble6),
+                                  Icon(Icons.arrow_drop_down),
+                                ],
                               ),
-                            ),
-                            const SizedBox(height: AppConstants.valueDouble20),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                const Icon(Icons.notes_outlined),
-                                const SizedBox(
-                                  width: AppConstants.valueDouble12,
+                              const SizedBox(height: AppConstants.valueDouble25),
+                              Text(
+                                title,
+                                style: const TextStyle(
+                                  fontSize: AppConstants.valueDouble28,
+                                  fontWeight: FontWeight.w500,
                                 ),
-                                Expanded(
-                                  child: CommonInputField(
-                                    controller: _controller.notesController,
-                                    hintText: "Add description",
-                                    maxLines: null,
-                                    style: const TextStyle(fontSize: 16),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: AppConstants.valueDouble20),
-                            GestureDetector(
-                              onTap: () => _openTaskCalendar(context),
-                              child: Row(
+                              ),
+                              const SizedBox(height: AppConstants.valueDouble20),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
-                                  const Icon(Icons.adjust),
+                                  const Icon(Icons.notes_outlined),
                                   const SizedBox(
                                     width: AppConstants.valueDouble12,
                                   ),
-                                  chip("Due $dueDateDisplay"),
+                                  Expanded(
+                                    child: CommonInputField(
+                                      controller: _controller.notesController,
+                                      hintText: "Add description",
+                                      maxLines: null,
+                                      style: const TextStyle(fontSize: 16),
+                                    ),
+                                  ),
                                 ],
                               ),
-                            ),
-                            const SizedBox(height: AppConstants.valueDouble12),
-                            Row(
-                              children: [
-                                const Icon(Icons.access_time),
-                                const SizedBox(
-                                  width: AppConstants.valueDouble12,
+                              const SizedBox(height: AppConstants.valueDouble20),
+                              GestureDetector(
+                                onTap: () => _openTaskCalendar(context),
+                                child: Row(
+                                  children: [
+                                    const Icon(Icons.adjust),
+                                    const SizedBox(
+                                      width: AppConstants.valueDouble12,
+                                    ),
+                                    chip("Due $dueDateDisplay"),
+                                  ],
                                 ),
-                                chip(createAtDate),
-                              ],
-                            ),
-                            const SizedBox(height: AppConstants.valueDouble25),
-                            Row(
-                              children: const [
-                                Icon(Icons.subdirectory_arrow_right),
-                                SizedBox(width: AppConstants.valueDouble12),
-                                Text(
-                                  "Add subtasks",
-                                  style: TextStyle(
-                                    fontSize: AppConstants.valueDouble16,
+                              ),
+                              const SizedBox(height: AppConstants.valueDouble12),
+                              Row(
+                                children: [
+                                  const Icon(Icons.access_time),
+                                  const SizedBox(
+                                    width: AppConstants.valueDouble12,
                                   ),
-                                ),
-                              ],
-                            ),
-                          ],
+                                  chip(createAtDate),
+                                ],
+                              ),
+                              const SizedBox(height: AppConstants.valueDouble25),
+
+                              ...List.generate(_controller.subtasks.length, (index) {
+                                return SubtaskTile(
+                                  subtask: _controller.subtasks[index],
+                                  onRemove: () => _controller.removeSubtask(index),
+                                );
+                              }),
+
+                              Row(
+                                children: [
+                                  Icon(Icons.subdirectory_arrow_right),
+                                  SizedBox(width: AppConstants.valueDouble12),
+                                  GestureDetector(
+                                    onTap: () {
+                                      _controller.addSubtask();
+                                    },
+                                    child: const Text(
+                                      "Add subtasks",
+                                      style: TextStyle(
+                                        fontSize: AppConstants.valueDouble16,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ),
