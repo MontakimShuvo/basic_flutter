@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../widgets/bottom_sheet/common_bottom_sheet.dart';
 import '../controller/home_controller.dart';
-import '../../../widgets/app_bar.dart';
+import '../../../widgets/common_app_bar.dart';
 import '../../new_tab_screen/create_new_tab_screen.dart';
 import 'widget/task_info.dart';
 
@@ -57,8 +57,7 @@ class _HomePageState extends State<HomePage> {
               final controller = DefaultTabController.of(context);
 
               return Scaffold(
-                appBar: appBar(
-                  context: context,
+                appBar: CommonAppBar(
                   title: widget.title,
                   leadingIcon: widget.leadingIcon,
                   trailingIcon: widget.trailingIcon,

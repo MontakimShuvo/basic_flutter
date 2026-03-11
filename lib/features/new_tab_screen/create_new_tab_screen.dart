@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../widgets/app_bar.dart';
+import '../../widgets/common_app_bar.dart';
 import '../../widgets/text_field/input_text_field.dart';
 
 class CreateNewTabScreen extends StatefulWidget {
@@ -32,8 +32,7 @@ class _CreateNewTabScreenState extends State<CreateNewTabScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: appBar(
-        context: context,
+      appBar: CommonAppBar(
         title: "Create New Task",
         leadingIcon: "assets/icons/Arrow - Left 2.svg",
         trailingIcon: null,
