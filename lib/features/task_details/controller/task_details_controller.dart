@@ -51,6 +51,10 @@ class TaskDetailsController extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> deleteSubtask(int index) async{
+    await _dbService.deleteSubtask(subtasks[index].id!);
+  }
+
   Future<void> saveChanges() async {
     final int taskId = task['id'];
     

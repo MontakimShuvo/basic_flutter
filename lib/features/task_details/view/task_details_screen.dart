@@ -203,7 +203,11 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
                               ...List.generate(_controller.subtasks.length, (index) {
                                 return SubtaskTile(
                                   subtask: _controller.subtasks[index],
-                                  onRemove: () => _controller.removeSubtask(index),
+                                  onRemove: () =>
+                                  {
+                                    _controller.deleteSubtask(index),
+                                    _controller.removeSubtask(index)
+                                  }
                                 );
                               }),
 
