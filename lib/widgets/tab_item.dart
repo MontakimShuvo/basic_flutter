@@ -20,8 +20,8 @@ class TabItem extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           if (index == 0)
-            SvgPicture.asset(
-              'assets/icons/Filter.svg',
+            Image.asset(
+              'assets/icons/star.png',
               width: 24,
               height: 24,
             ),
