@@ -37,16 +37,7 @@ class PendingTaskWidget extends StatelessWidget {
           const SizedBox(height: AppConstants.valueDouble12),
           Column(
             children: tasks.map((task) {
-              return GestureDetector(
-                onTap: () async {
-                  await Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => TaskDetailsScreen(task: task)),
-                  );
-                  controller.loadTasks();
-                },
-                child: Padding(
+              return Padding(
                   padding: const EdgeInsets.symmetric(
                     vertical: AppConstants.valueDouble8,
                   ),
@@ -62,49 +53,57 @@ class PendingTaskWidget extends StatelessWidget {
                             : Colors.grey,
                       ),
                       const SizedBox(width: AppConstants.valueDouble12),
-
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              task['title'] ?? '',
-                              style: TextStyle(
-                                fontSize: AppConstants.valueDouble16,
-                                decoration: task['is_completed'] == 1
-                                    ? TextDecoration.lineThrough
-                                    : null,
-                                color: task['is_completed'] == 1
-                                    ? Colors.grey
-                                    : Colors.black,
-
-                              ),
-                            ),
-
-                            Text(
-                              task['notes'] ?? '',
-                              style: TextStyle(
-                                fontSize: AppConstants.valueDouble12,
-                              ),
-                            ),
-                            if (task['due_date'] != null)
+                      GestureDetector(
+                        onTap: () async {
+                          await Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => TaskDetailsScreen(task: task)),
+                          );
+                          controller.loadTasks();
+                        },
+                        child: Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
                               Text(
-                                DateFormat('EEEE, MMM d, h:mm a').format(
-                                    DateTime.fromMillisecondsSinceEpoch(
-                                        task['due_date'])),
+                                task['title'] ?? '',
+                                style: TextStyle(
+                                  fontSize: AppConstants.valueDouble16,
+                                  decoration: task['is_completed'] == 1
+                                      ? TextDecoration.lineThrough
+                                      : null,
+                                  color: task['is_completed'] == 1
+                                      ? Colors.grey
+                                      : Colors.black,
+
+                                ),
+                              ),
+
+                              Text(
+                                task['notes'] ?? '',
                                 style: TextStyle(
                                   fontSize: AppConstants.valueDouble12,
                                 ),
                               ),
+                              if (task['due_date'] != null)
+                                Text(
+                                  DateFormat('EEEE, MMM d, h:mm a').format(
+                                      DateTime.fromMillisecondsSinceEpoch(
+                                          task['due_date'])),
+                                  style: TextStyle(
+                                    fontSize: AppConstants.valueDouble12,
+                                  ),
+                                ),
 
-                            _SubtaskSection(controller: controller,task: task),
-                          ],
+                              _SubtaskSection(controller: controller,task: task),
+                            ],
+                          ),
                         ),
                       ),
                     ],
                   ),
-                ),
-              );
+                );
             }).toList(),
           ),
         ],
