@@ -10,12 +10,10 @@ class HomePage extends StatefulWidget {
   const HomePage({
     super.key,
     this.title,
-    this.leadingIcon = 'assets/icons/Arrow - Left 2.svg',
     this.trailingIcon = 'assets/icons/dots.svg',
   });
 
   final String? title;
-  final String? leadingIcon;
   final String? trailingIcon;
 
   @override
@@ -59,7 +57,6 @@ class _HomePageState extends State<HomePage> {
               return Scaffold(
                 appBar: CommonAppBar(
                   title: widget.title,
-                  leadingIcon: widget.leadingIcon,
                   trailingIcon: widget.trailingIcon,
                   tabsTitle: _homeController.tabsTitle,
                   addNewTask: (ctx) => _gotoCreateTaskScreen(ctx),

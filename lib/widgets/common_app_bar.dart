@@ -67,7 +67,7 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
                 color: Colors.blue,
                 borderRadius: BorderRadius.circular(50),
               ),
-              child: Text(trailingIcon!),
+              child: SvgPicture.asset(trailingIcon!),
             ),
           ),
         if (actionName != null)
