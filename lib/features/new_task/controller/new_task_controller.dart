@@ -9,6 +9,7 @@ class NewTaskController extends ChangeNotifier {
   final DatabaseService _dbService = DatabaseService();
 
   List<Subtask> subtasks = [];
+  String currentSort = "my_order";
 
   NewTaskController({this.id, required this.taskName}) {
     loadTasks();
@@ -33,7 +34,37 @@ class NewTaskController extends ChangeNotifier {
       final tasks = await _dbService.getTasksByListId(id!);
       items.clear();
       items.addAll(tasks);
+      _applySort();
       notifyListeners();
+    }
+  }
+
+  void sortTasks(String sortType) {
+    currentSort = sortType;
+    _applySort();
+    notifyListeners();
+  }
+
+  void _applySort() {
+    switch (currentSort) {
+      case "date":
+        items.sort((a, b) => (a['created_at'] ?? 0).compareTo(b['created_at'] ?? 0));
+        break;
+      case "dead_line":
+        items.sort((a, b) {
+          if (a['due_date'] == null && b['due_date'] == null) return 0;
+          if (a['due_date'] == null) return 1;
+          if (b['due_date'] == null) return -1;
+          return (a['due_date'] as int).compareTo(b['due_date'] as int);
+        });
+        break;
+      case "title":
+        items.sort((a, b) => (a['title'] ?? '').toLowerCase().compareTo((b['title'] ?? '').toLowerCase()));
+        break;
+      case "my_order":
+      default:
+        items.sort((a, b) => (a['position'] ?? 0).compareTo(b['position'] ?? 0));
+        break;
     }
   }
 
@@ -53,7 +84,7 @@ class NewTaskController extends ChangeNotifier {
     final taskId = await _dbService.createTask(newTask);
 
     items.add({...newTask, 'id': taskId});
-
+    _applySort();
     notifyListeners();
   }
 }

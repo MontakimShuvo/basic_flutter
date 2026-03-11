@@ -8,6 +8,8 @@ import 'package:untitled/features/task_details/view/task_details_screen.dart';
 import 'package:untitled/features/task_details/view/widget/subtask_tile.dart';
 
 import '../../../../constants/app_colors_as.dart';
+import '../../../../widgets/bottom_sheet/common_bottom_sheet.dart';
+import '../../../home/view/widget/sort_bottom_sheet.dart';
 
 class TaskCardContainer extends StatelessWidget {
   final String title;
@@ -61,12 +63,37 @@ class TaskCardContainer extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  title,
-                  style: const TextStyle(
-                    fontSize: AppConstants.valueDouble15,
-                    fontWeight: FontWeight.bold,
-                  ),
+                Row(
+                  mainAxisAlignment: .spaceBetween,
+                  children: [
+                    Text(
+                      title,
+                      style: const TextStyle(
+                        fontSize: AppConstants.valueDouble15,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+
+                    GestureDetector(
+                      onTap: (){
+                        CommonBottomSheet.show(
+                          context: context,
+                          body: SortBottomSheet(
+                            selectedSort: "my_order", // Manage this state in your controller
+                            onSortSelected: (value) {
+                              controller.sortTasks(value);
+                                // Handle the sort tasks on the base value type
+                            },
+                          ),
+                        );
+                      },
+                      child: Image.asset(
+                        'assets/icons/ic_sorting.png',
+                        width: 20,
+                        height: 20,
+                      ),
+                    )
+                  ],
                 ),
                 const SizedBox(height: 12),
                 Column(
