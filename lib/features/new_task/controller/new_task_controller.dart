@@ -29,6 +29,11 @@ class NewTaskController extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> toggleTask(int taskId, int isCompleted) async {
+    await _dbService.updateTask(taskId, {'is_completed': isCompleted == 1 ? 0 : 1});
+    await loadTasks();
+  }
+
   Future<void> loadTasks() async {
     if (id != null) {
       final tasks = await _dbService.getTasksByListId(id!);

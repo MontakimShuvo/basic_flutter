@@ -38,72 +38,68 @@ class PendingTaskWidget extends StatelessWidget {
           Column(
             children: tasks.map((task) {
               return Padding(
-                  padding: const EdgeInsets.symmetric(
-                    vertical: AppConstants.valueDouble8,
-                  ),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Icon(
-                        task['is_completed'] == 1
-                            ? Icons.check_circle
-                            : Icons.radio_button_unchecked,
-                        color: task['is_completed'] == 1
-                            ? Colors.green
-                            : Colors.grey,
+                padding: const EdgeInsets.symmetric(
+                  vertical: AppConstants.valueDouble8,
+                ),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    GestureDetector(
+                      onTap: () {
+                        controller.toggleTask(task['id'], task['is_completed']);
+                      },
+                      child: Icon(
+                        Icons.radio_button_unchecked,
+                        color: Colors.grey,
                       ),
-                      const SizedBox(width: AppConstants.valueDouble12),
-                      GestureDetector(
-                        onTap: () async {
-                          await Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => TaskDetailsScreen(task: task)),
-                          );
-                          controller.loadTasks();
-                        },
-                        child: Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                task['title'] ?? '',
-                                style: TextStyle(
-                                  fontSize: AppConstants.valueDouble16,
-                                  decoration: task['is_completed'] == 1
-                                      ? TextDecoration.lineThrough
-                                      : null,
-                                  color: task['is_completed'] == 1
-                                      ? Colors.grey
-                                      : Colors.black,
-
-                                ),
+                    ),
+                    const SizedBox(width: AppConstants.valueDouble12),
+                    GestureDetector(
+                      onTap: () async {
+                        await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => TaskDetailsScreen(task: task),
+                          ),
+                        );
+                        controller.loadTasks();
+                      },
+                      child: Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              task['title'] ?? '',
+                              style: TextStyle(
+                                fontSize: AppConstants.valueDouble16,
+                                color: Colors.black,
                               ),
-
+                            ),
+                            Text(
+                              task['notes'] ?? '',
+                              style: const TextStyle(
+                                fontSize: AppConstants.valueDouble12,
+                              ),
+                            ),
+                            if (task['due_date'] != null)
                               Text(
-                                task['notes'] ?? '',
-                                style: TextStyle(
+                                DateFormat('EEEE, MMM d, h:mm a').format(
+                                  DateTime.fromMillisecondsSinceEpoch(
+                                    task['due_date'],
+                                  ),
+                                ),
+                                style: const TextStyle(
                                   fontSize: AppConstants.valueDouble12,
                                 ),
                               ),
-                              if (task['due_date'] != null)
-                                Text(
-                                  DateFormat('EEEE, MMM d, h:mm a').format(
-                                      DateTime.fromMillisecondsSinceEpoch(
-                                          task['due_date'])),
-                                  style: TextStyle(
-                                    fontSize: AppConstants.valueDouble12,
-                                  ),
-                                ),
-
-                              _SubtaskSection(controller: controller,task: task),
-                            ],
-                          ),
+                            _SubtaskSection(controller: controller, task: task),
+                          ],
                         ),
                       ),
-                    ],
-                  ),
-                );
+                    ),
+                  ],
+                ),
+              );
             }).toList(),
           ),
         ],
@@ -122,7 +118,6 @@ class _SubtaskSection extends StatelessWidget {
   final NewTaskController controller;
   final Map<String, dynamic> task;
 
-
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<List<Map<String, dynamic>>>(
@@ -130,7 +125,7 @@ class _SubtaskSection extends StatelessWidget {
       builder: (context, snapshot) {
         if (snapshot.hasData && snapshot.data!.isNotEmpty) {
           return Column(
-            crossAxisAlignment: .start,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: snapshot.data!.map((stMap) {
               final int subtaskId = stMap['id'];
               final int isCompleted = stMap['is_completed'];
@@ -170,7 +165,7 @@ class _HeaderSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Row(
-      mainAxisAlignment: .spaceBetween,
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(
           title,
@@ -179,16 +174,14 @@ class _HeaderSection extends StatelessWidget {
             fontWeight: FontWeight.bold,
           ),
         ),
-
         GestureDetector(
-          onTap: (){
+          onTap: () {
             CommonBottomSheet.show(
               context: context,
               body: SortBottomSheet(
                 selectedSort: "my_order",
                 onSortSelected: (value) {
                   controller.sortTasks(value);
-
                 },
               ),
             );
@@ -198,7 +191,7 @@ class _HeaderSection extends StatelessWidget {
             width: AppConstants.valueDouble20,
             height: AppConstants.valueDouble20,
           ),
-        )
+        ),
       ],
     );
   }
