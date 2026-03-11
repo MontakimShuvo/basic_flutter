@@ -10,6 +10,7 @@ import 'package:untitled/features/task_details/view/widget/subtask_tile.dart';
 import '../../../../constants/app_colors_as.dart';
 import '../../../../widgets/bottom_sheet/common_bottom_sheet.dart';
 import '../../../home/view/widget/sort_bottom_sheet.dart';
+import 'complete_task_widget.dart';
 
 class TaskCardContainer extends StatelessWidget {
   final String title;
@@ -25,39 +26,50 @@ class TaskCardContainer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (tasks.isEmpty) {
-      return Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            margin: const EdgeInsets.all(16),
-            height: 200,
-            width: double.infinity,
-            decoration: BoxDecoration(
-              color: AppColors.noCardFoundBackgroundColor,
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child:  Center(
-              child: Image.asset(
-                'assets/icons/no_task_found.png',
-                width: double.infinity,
-              ),
-            ),
-          ),
-        ],
-      );
-    }
+    final pendingTasks = tasks
+        .where((task) => task['is_completed'] == 0)
+        .toList();
+    final completeTasks = tasks
+        .where((task) => task['is_completed'] == 1)
+        .toList();
 
     return SingleChildScrollView(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         mainAxisSize: MainAxisSize.min,
         children: [
-          PendingTaskWidget(title: title, controller: controller, tasks: tasks),
+          if (pendingTasks.isEmpty)
+            Container(
+              margin: const EdgeInsets.all(16),
+              height: 200,
+              width: double.infinity,
+              decoration: BoxDecoration(
+                color: AppColors.noCardFoundBackgroundColor,
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Center(
+                child: Image.asset(
+                  'assets/icons/no_task_found.png',
+                  width: double.infinity,
+                ),
+              ),
+            ),
+
+          if (pendingTasks.isNotEmpty)
+            PendingTaskWidget(
+              title: title,
+              controller: controller,
+              tasks: pendingTasks,
+            ),
+
+          if (completeTasks.isNotEmpty)
+            CompleteTaskWidget(
+              title: title,
+              controller: controller,
+              tasks: completeTasks,
+            ),
         ],
       ),
     );
   }
 }
-
-

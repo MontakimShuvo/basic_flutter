@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:untitled/features/new_task/view/widget/subtask_section.dart';
 
 import '../../../../constants/app_constants.dart';
-import '../../../../data/model/subtask.dart';
 import '../../../../widgets/bottom_sheet/common_bottom_sheet.dart';
 import '../../../home/view/widget/sort_bottom_sheet.dart';
 import '../../../task_details/view/task_details_screen.dart';
-import '../../../task_details/view/widget/subtask_tile.dart';
 import '../../controller/new_task_controller.dart';
+import 'header_section.dart';
 
 class PendingTaskWidget extends StatelessWidget {
   const PendingTaskWidget({
@@ -23,6 +23,8 @@ class PendingTaskWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // final pendingTasks = tasks.where((task) => task['is_completed'] == 0).toList();
+
     return Container(
       margin: const EdgeInsets.all(AppConstants.valueDouble16),
       padding: const EdgeInsets.all(AppConstants.valueDouble16),
@@ -33,7 +35,17 @@ class PendingTaskWidget extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _HeaderSection(title: title, controller: controller),
+          HeaderSection(title: title, controller: controller,onSortTap: (){
+            CommonBottomSheet.show(
+              context: context,
+              body: SortBottomSheet(
+                selectedSort: "my_order",
+                onSortSelected: (value) {
+                  controller.sortTasks(value);
+                },
+              ),
+            );
+          },),
           const SizedBox(height: AppConstants.valueDouble12),
           Column(
             children: tasks.map((task) {
@@ -48,7 +60,7 @@ class PendingTaskWidget extends StatelessWidget {
                       onTap: () {
                         controller.toggleTask(task['id'], task['is_completed']);
                       },
-                      child: Icon(
+                      child: const Icon(
                         Icons.radio_button_unchecked,
                         color: Colors.grey,
                       ),
@@ -70,7 +82,7 @@ class PendingTaskWidget extends StatelessWidget {
                           children: [
                             Text(
                               task['title'] ?? '',
-                              style: TextStyle(
+                              style: const TextStyle(
                                 fontSize: AppConstants.valueDouble16,
                                 color: Colors.black,
                               ),
@@ -92,7 +104,7 @@ class PendingTaskWidget extends StatelessWidget {
                                   fontSize: AppConstants.valueDouble12,
                                 ),
                               ),
-                            _SubtaskSection(controller: controller, task: task),
+                            SubtaskSection(controller: controller, task: task),
                           ],
                         ),
                       ),
@@ -108,91 +120,6 @@ class PendingTaskWidget extends StatelessWidget {
   }
 }
 
-class _SubtaskSection extends StatelessWidget {
-  const _SubtaskSection({
-    super.key,
-    required this.controller,
-    required this.task,
-  });
 
-  final NewTaskController controller;
-  final Map<String, dynamic> task;
 
-  @override
-  Widget build(BuildContext context) {
-    return FutureBuilder<List<Map<String, dynamic>>>(
-      future: controller.loadSubtasks(task['id']),
-      builder: (context, snapshot) {
-        if (snapshot.hasData && snapshot.data!.isNotEmpty) {
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: snapshot.data!.map((stMap) {
-              final int subtaskId = stMap['id'];
-              final int isCompleted = stMap['is_completed'];
-              return SubtaskTile(
-                isShownArrow: false,
-                width: 0,
-                fontSize: AppConstants.valueDouble14,
-                subtask: Subtask(
-                  id: subtaskId,
-                  title: stMap['title'],
-                  isCompleted: isCompleted,
-                  controller: TextEditingController(text: stMap['title']),
-                ),
-                onRemove: () async {
-                  await controller.deleteSubtask(subtaskId);
-                },
-              );
-            }).toList(),
-          );
-        }
-        return const SizedBox(height: 2);
-      },
-    );
-  }
-}
 
-class _HeaderSection extends StatelessWidget {
-  const _HeaderSection({
-    super.key,
-    required this.title,
-    required this.controller,
-  });
-
-  final String title;
-  final NewTaskController controller;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(
-          title,
-          style: const TextStyle(
-            fontSize: AppConstants.valueDouble15,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        GestureDetector(
-          onTap: () {
-            CommonBottomSheet.show(
-              context: context,
-              body: SortBottomSheet(
-                selectedSort: "my_order",
-                onSortSelected: (value) {
-                  controller.sortTasks(value);
-                },
-              ),
-            );
-          },
-          child: Image.asset(
-            'assets/icons/ic_sorting.png',
-            width: AppConstants.valueDouble20,
-            height: AppConstants.valueDouble20,
-          ),
-        ),
-      ],
-    );
-  }
-}
