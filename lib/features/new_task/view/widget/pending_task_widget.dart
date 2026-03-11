@@ -1,0 +1,206 @@
+import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+
+import '../../../../constants/app_constants.dart';
+import '../../../../data/model/subtask.dart';
+import '../../../../widgets/bottom_sheet/common_bottom_sheet.dart';
+import '../../../home/view/widget/sort_bottom_sheet.dart';
+import '../../../task_details/view/task_details_screen.dart';
+import '../../../task_details/view/widget/subtask_tile.dart';
+import '../../controller/new_task_controller.dart';
+
+class PendingTaskWidget extends StatelessWidget {
+  const PendingTaskWidget({
+    super.key,
+    required this.title,
+    required this.controller,
+    required this.tasks,
+  });
+
+  final String title;
+  final NewTaskController controller;
+  final List<Map<String, dynamic>> tasks;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.all(AppConstants.valueDouble16),
+      padding: const EdgeInsets.all(AppConstants.valueDouble16),
+      decoration: BoxDecoration(
+        color: const Color(0xFFEFEFF1),
+        borderRadius: BorderRadius.circular(AppConstants.valueDouble20),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _HeaderSection(title: title, controller: controller),
+          const SizedBox(height: AppConstants.valueDouble12),
+          Column(
+            children: tasks.map((task) {
+              return GestureDetector(
+                onTap: () async {
+                  await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => TaskDetailsScreen(task: task)),
+                  );
+                  controller.loadTasks();
+                },
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    vertical: AppConstants.valueDouble8,
+                  ),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Icon(
+                        task['is_completed'] == 1
+                            ? Icons.check_circle
+                            : Icons.radio_button_unchecked,
+                        color: task['is_completed'] == 1
+                            ? Colors.green
+                            : Colors.grey,
+                      ),
+                      const SizedBox(width: AppConstants.valueDouble12),
+
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              task['title'] ?? '',
+                              style: TextStyle(
+                                fontSize: AppConstants.valueDouble16,
+                                decoration: task['is_completed'] == 1
+                                    ? TextDecoration.lineThrough
+                                    : null,
+                                color: task['is_completed'] == 1
+                                    ? Colors.grey
+                                    : Colors.black,
+
+                              ),
+                            ),
+
+                            Text(
+                              task['notes'] ?? '',
+                              style: TextStyle(
+                                fontSize: AppConstants.valueDouble12,
+                              ),
+                            ),
+                            if (task['due_date'] != null)
+                              Text(
+                                DateFormat('EEEE, MMM d, h:mm a').format(
+                                    DateTime.fromMillisecondsSinceEpoch(
+                                        task['due_date'])),
+                                style: TextStyle(
+                                  fontSize: AppConstants.valueDouble12,
+                                ),
+                              ),
+
+                            _SubtaskSection(controller: controller,task: task),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            }).toList(),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _SubtaskSection extends StatelessWidget {
+  const _SubtaskSection({
+    super.key,
+    required this.controller,
+    required this.task,
+  });
+
+  final NewTaskController controller;
+  final Map<String, dynamic> task;
+
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<List<Map<String, dynamic>>>(
+      future: controller.loadSubtasks(task['id']),
+      builder: (context, snapshot) {
+        if (snapshot.hasData && snapshot.data!.isNotEmpty) {
+          return Column(
+            crossAxisAlignment: .start,
+            children: snapshot.data!.map((stMap) {
+              final int subtaskId = stMap['id'];
+              final int isCompleted = stMap['is_completed'];
+              return SubtaskTile(
+                isShownArrow: false,
+                width: 0,
+                fontSize: AppConstants.valueDouble14,
+                subtask: Subtask(
+                  id: subtaskId,
+                  title: stMap['title'],
+                  isCompleted: isCompleted,
+                  controller: TextEditingController(text: stMap['title']),
+                ),
+                onRemove: () async {
+                  await controller.deleteSubtask(subtaskId);
+                },
+              );
+            }).toList(),
+          );
+        }
+        return const SizedBox(height: 2);
+      },
+    );
+  }
+}
+
+class _HeaderSection extends StatelessWidget {
+  const _HeaderSection({
+    super.key,
+    required this.title,
+    required this.controller,
+  });
+
+  final String title;
+  final NewTaskController controller;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: .spaceBetween,
+      children: [
+        Text(
+          title,
+          style: const TextStyle(
+            fontSize: AppConstants.valueDouble15,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+
+        GestureDetector(
+          onTap: (){
+            CommonBottomSheet.show(
+              context: context,
+              body: SortBottomSheet(
+                selectedSort: "my_order",
+                onSortSelected: (value) {
+                  controller.sortTasks(value);
+
+                },
+              ),
+            );
+          },
+          child: Image.asset(
+            'assets/icons/ic_sorting.png',
+            width: AppConstants.valueDouble20,
+            height: AppConstants.valueDouble20,
+          ),
+        )
+      ],
+    );
+  }
+}
