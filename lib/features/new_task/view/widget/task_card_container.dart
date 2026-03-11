@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:untitled/constants/app_constants.dart';
+import 'package:untitled/data/database_service.dart';
+import 'package:untitled/data/model/subtask.dart';
 import 'package:untitled/features/new_task/controller/new_task_controller.dart';
 import 'package:untitled/features/task_details/view/task_details_screen.dart';
+import 'package:untitled/features/task_details/view/widget/subtask_tile.dart';
 
 class TaskCardContainer extends StatelessWidget {
   final String title;
@@ -126,6 +129,28 @@ class TaskCardContainer extends StatelessWidget {
                                         fontSize: AppConstants.valueDouble12,
                                       ),
                                     ),
+
+                                  FutureBuilder<List<Map<String, dynamic>>>(
+                                    future: controller.loadSubtasks(task['id']),
+                                    builder: (context, snapshot) {
+                                      if (snapshot.hasData && snapshot.data!.isNotEmpty) {
+                                        return Column(
+                                          children: snapshot.data!.map((stMap) {
+                                            return SubtaskTile(
+                                              subtask: Subtask(
+                                                id: stMap['id'],
+                                                title: stMap['title'],
+                                                isCompleted: stMap['is_completed'],
+                                                controller: TextEditingController(text: stMap['title']),
+                                              ),
+                                              onRemove: () {},
+                                            );
+                                          }).toList(),
+                                        );
+                                      }
+                                      return const SizedBox(height: 2,);
+                                    },
+                                  ),
                                 ],
                               ),
                             ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../data/database_service.dart';
+import '../../../data/model/subtask.dart';
 
 class NewTaskController extends ChangeNotifier {
   final int? id;
@@ -7,8 +8,23 @@ class NewTaskController extends ChangeNotifier {
   final List<Map<String, dynamic>> items = [];
   final DatabaseService _dbService = DatabaseService();
 
+  List<Subtask> subtasks = [];
+
   NewTaskController({this.id, required this.taskName}) {
     loadTasks();
+  }
+
+  Future<List<Map<String, dynamic>>>loadSubtasks(int taskId) async {
+    return await _dbService.getSubtasksByTaskId(taskId);
+    // subtasks = maps.map((map) {
+    //   return Subtask(
+    //     id: map['id'],
+    //     title: map['title'],
+    //     isCompleted: map['is_completed'],
+    //     controller: TextEditingController(text: map['title']),
+    //   );
+    // }).toList();
+    // notifyListeners();
   }
 
   Future<void> loadTasks() async {
