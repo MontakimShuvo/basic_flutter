@@ -7,6 +7,8 @@ import 'package:untitled/features/new_task/controller/new_task_controller.dart';
 import 'package:untitled/features/task_details/view/task_details_screen.dart';
 import 'package:untitled/features/task_details/view/widget/subtask_tile.dart';
 
+import '../../../../constants/app_colors_as.dart';
+
 class TaskCardContainer extends StatelessWidget {
   final String title;
   final List<Map<String, dynamic>> tasks;
@@ -27,17 +29,16 @@ class TaskCardContainer extends StatelessWidget {
         children: [
           Container(
             margin: const EdgeInsets.all(16),
-            padding: const EdgeInsets.all(16),
             height: 200,
             width: double.infinity,
             decoration: BoxDecoration(
-              color: const Color(0xFFEFEFF1),
+              color: AppColors.noCardFoundBackgroundColor,
               borderRadius: BorderRadius.circular(20),
             ),
-            child: const Center(
-              child: Text(
-                "No tasks yet",
-                style: TextStyle(color: Colors.black, fontSize: 16),
+            child:  Center(
+              child: Image.asset(
+                'assets/icons/no_task_found.png',
+                width: double.infinity,
               ),
             ),
           ),
