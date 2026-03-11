@@ -6,8 +6,8 @@ import '../../../widgets/common_app_bar.dart';
 import '../../new_tab_screen/create_new_tab_screen.dart';
 import 'widget/task_info.dart';
 
-class HomePage extends StatefulWidget {
-  const HomePage({
+class HomeScreen extends StatefulWidget {
+  const HomeScreen({
     super.key,
     this.title,
     this.trailingIcon = 'assets/icons/dots.svg',
@@ -17,10 +17,10 @@ class HomePage extends StatefulWidget {
   final String? trailingIcon;
 
   @override
-  State<HomePage> createState() => _HomePageState();
+  State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomeScreenState extends State<HomeScreen> {
   final HomeController _homeController = HomeController();
 
   void _gotoCreateTaskScreen(BuildContext context) async {
@@ -65,7 +65,7 @@ class _HomePageState extends State<HomePage> {
                 body: TabBarView(children: _homeController.tabBarView),
                 floatingActionButton: FloatingActionButton(
                   onPressed: () {
-                    commonBottomSheet(
+                    CommonBottomSheet.show(
                       context: context,
                       body: TaskInfo(
                         homeController: _homeController,

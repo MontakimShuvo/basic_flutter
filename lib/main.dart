@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:untitled/features/home/view/home.dart';
+import 'package:untitled/features/home/view/home_screen.dart';
 import 'package:untitled/utils/size_config.dart';
 
 void main() {
@@ -16,7 +16,7 @@ class MyApp extends StatelessWidget {
     return  MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: ThemeData(fontFamily: 'Poppins'),
-      home:  HomePage(),
+      home:  HomeScreen(),
     );
   }
 }
