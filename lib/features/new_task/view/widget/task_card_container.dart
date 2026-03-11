@@ -135,20 +135,28 @@ class TaskCardContainer extends StatelessWidget {
                                     builder: (context, snapshot) {
                                       if (snapshot.hasData && snapshot.data!.isNotEmpty) {
                                         return Column(
+                                          crossAxisAlignment: .start,
                                           children: snapshot.data!.map((stMap) {
+                                            final int subtaskId = stMap['id'];
+                                            final int isCompleted = stMap['is_completed'];
                                             return SubtaskTile(
+                                              isShownArrow: false,
+                                              width: 0,
+                                              fontSize: AppConstants.valueDouble14,
                                               subtask: Subtask(
-                                                id: stMap['id'],
+                                                id: subtaskId,
                                                 title: stMap['title'],
-                                                isCompleted: stMap['is_completed'],
+                                                isCompleted: isCompleted,
                                                 controller: TextEditingController(text: stMap['title']),
                                               ),
-                                              onRemove: () {},
+                                              onRemove: () async {
+                                                await controller.deleteSubtask(subtaskId);
+                                              },
                                             );
                                           }).toList(),
                                         );
                                       }
-                                      return const SizedBox(height: 2,);
+                                      return const SizedBox(height: 2);
                                     },
                                   ),
                                 ],

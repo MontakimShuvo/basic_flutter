@@ -202,6 +202,7 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
 
                               ...List.generate(_controller.subtasks.length, (index) {
                                 return SubtaskTile(
+                                  isShownArrow: true,
                                   subtask: _controller.subtasks[index],
                                   onRemove: () =>
                                   {

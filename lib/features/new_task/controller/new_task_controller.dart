@@ -14,17 +14,18 @@ class NewTaskController extends ChangeNotifier {
     loadTasks();
   }
 
-  Future<List<Map<String, dynamic>>>loadSubtasks(int taskId) async {
+  Future<List<Map<String, dynamic>>> loadSubtasks(int taskId) async {
     return await _dbService.getSubtasksByTaskId(taskId);
-    // subtasks = maps.map((map) {
-    //   return Subtask(
-    //     id: map['id'],
-    //     title: map['title'],
-    //     isCompleted: map['is_completed'],
-    //     controller: TextEditingController(text: map['title']),
-    //   );
-    // }).toList();
-    // notifyListeners();
+  }
+
+  Future<void> deleteSubtask(int subtaskId) async {
+    await _dbService.deleteSubtask(subtaskId);
+    notifyListeners();
+  }
+
+  Future<void> toggleSubtask(int subtaskId, int isCompleted) async {
+    await _dbService.updateSubtask(subtaskId, {'is_completed': isCompleted == 1 ? 0 : 1});
+    notifyListeners();
   }
 
   Future<void> loadTasks() async {

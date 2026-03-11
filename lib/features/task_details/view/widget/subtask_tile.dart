@@ -4,11 +4,17 @@ import '../../../../data/model/subtask.dart';
 import '../../../../widgets/text_field/common_input_field.dart';
 
 class SubtaskTile extends StatelessWidget {
+  final bool? isShownArrow;
+  final double? fontSize;
+  final double? width;
   final Subtask subtask;
   final VoidCallback onRemove;
 
   const SubtaskTile({
     super.key,
+    this.isShownArrow,
+    this.fontSize,
+    this.width,
     required this.subtask,
     required this.onRemove,
   });
@@ -19,8 +25,9 @@ class SubtaskTile extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: 2.0),
       child: Row(
         children: [
-          const Icon(Icons.subdirectory_arrow_right, color: Colors.transparent),
-          const SizedBox(width: AppConstants.valueDouble12),
+          if (isShownArrow == true)
+              const Icon(Icons.subdirectory_arrow_right, color: Colors.transparent),
+          if (isShownArrow == true) const SizedBox(width: AppConstants.valueDouble12),
           GestureDetector(
             onTap: onRemove,
             child: Icon(
@@ -30,13 +37,13 @@ class SubtaskTile extends StatelessWidget {
               color: subtask.isCompleted == 1 ? Colors.green : Colors.grey,
             ),
           ),
-          const SizedBox(width: AppConstants.valueDouble12),
+          SizedBox(width: width ?? AppConstants.valueDouble12),
           Expanded(
             child: CommonInputField(
               controller: subtask.controller,
               hintText: "Enter title",
               style: TextStyle(
-                fontSize: AppConstants.valueDouble16,
+                fontSize: fontSize ?? AppConstants.valueDouble16,
                 decoration: subtask.isCompleted == 1 ? TextDecoration.lineThrough : null,
                 color: subtask.isCompleted == 1 ? Colors.grey : Colors.black54,
               ),
