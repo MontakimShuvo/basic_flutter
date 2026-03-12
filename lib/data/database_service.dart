@@ -44,6 +44,7 @@ class DatabaseService {
         notes TEXT,
         due_date INTEGER,
         is_completed INTEGER DEFAULT 0,
+        is_favourite INTEGER DEFAULT 0,
         position INTEGER DEFAULT 0,
         created_at INTEGER NOT NULL,
         FOREIGN KEY (list_id) REFERENCES task_lists (id) ON DELETE CASCADE

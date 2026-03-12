@@ -34,6 +34,11 @@ class NewTaskController extends ChangeNotifier {
     await loadTasks();
   }
 
+  Future<void> toggleFavourite(int taskId, int isFavourite) async {
+    await _dbService.updateTask(taskId, {'is_favourite': isFavourite == 1 ? 0 : 1});
+    await loadTasks();
+  }
+
   Future<void> loadTasks() async {
     if (id != null) {
       final tasks = await _dbService.getTasksByListId(id!);
@@ -82,6 +87,7 @@ class NewTaskController extends ChangeNotifier {
       'notes': notes,
       'due_date': dueDate?.millisecondsSinceEpoch,
       'is_completed': 0,
+      'is_favourite': 0,
       'position': items.length,
       'created_at': DateTime.now().millisecondsSinceEpoch,
     };

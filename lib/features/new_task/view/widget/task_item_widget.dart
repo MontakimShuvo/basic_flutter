@@ -43,7 +43,8 @@ class TaskItemWidget extends StatelessWidget {
             onSortTap: onHeaderAction,
             assetIcon: headerAssetIcon,
           ),
-          if (isExpanded) ...[ // Conditional rendering
+          if (isExpanded) ...[
+            // Conditional rendering
             const SizedBox(height: AppConstants.valueDouble12),
             Column(
               children: tasks.map((task) {
@@ -52,68 +53,98 @@ class TaskItemWidget extends StatelessWidget {
                     vertical: AppConstants.valueDouble8,
                   ),
                   child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                    crossAxisAlignment: .start,
+                    mainAxisAlignment: .spaceBetween,
                     children: [
-                      GestureDetector(
-                        onTap: () {
-                          controller.toggleTask(task['id'], task['is_completed']);
-                        },
-                        child: Icon(
-                          task['is_completed'] == 1
-                              ? Icons.check_circle
-                              : Icons.radio_button_unchecked,
-                          color: task['is_completed'] == 1
-                              ? Colors.green
-                              : Colors.grey,
-                        ),
-                      ),
-                      const SizedBox(width: AppConstants.valueDouble12),
-                      GestureDetector(
-                        onTap: () async {
-                          await Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => TaskDetailsScreen(task: task),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          GestureDetector(
+                            onTap: () {
+                              controller.toggleTask(
+                                task['id'],
+                                task['is_completed'],
+                              );
+                            },
+                            child: Icon(
+                              task['is_completed'] == 1
+                                  ? Icons.check_circle
+                                  : Icons.radio_button_unchecked,
+                              color: task['is_completed'] == 1
+                                  ? Colors.green
+                                  : Colors.grey,
                             ),
-                          );
-                          controller.loadTasks();
-                        },
-                        child: Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                task['title'] ?? '',
-                                style: TextStyle(
-                                  fontSize: AppConstants.valueDouble16,
-                                  decoration: task['is_completed'] == 1
-                                      ? TextDecoration.lineThrough
-                                      : null,
-                                  color: Colors.black,
+                          ),
+                          const SizedBox(width: AppConstants.valueDouble12),
+                          GestureDetector(
+                            onTap: () async {
+                              await Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      TaskDetailsScreen(task: task),
                                 ),
-                              ),
-                              Text(
-                                task['notes'] ?? '',
-                                style: const TextStyle(
-                                  fontSize: AppConstants.valueDouble12,
-                                ),
-                              ),
-                              if (task['due_date'] != null)
-                                Text(
-                                  DateFormat('EEEE, MMM d, h:mm a').format(
-                                    DateTime.fromMillisecondsSinceEpoch(
-                                      task['due_date'],
+                              );
+                              controller.loadTasks();
+                            },
+                            child: Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    task['title'] ?? '',
+                                    style: TextStyle(
+                                      fontSize: AppConstants.valueDouble16,
+                                      decoration: task['is_completed'] == 1
+                                          ? TextDecoration.lineThrough
+                                          : null,
+                                      color: Colors.black,
                                     ),
                                   ),
-                                  style: const TextStyle(
-                                    fontSize: AppConstants.valueDouble12,
+                                  Text(
+                                    task['notes'] ?? '',
+                                    style: const TextStyle(
+                                      fontSize: AppConstants.valueDouble12,
+                                    ),
                                   ),
-                                ),
-                              SubtaskSection(controller: controller, task: task),
-                            ],
+                                  if (task['due_date'] != null)
+                                    Text(
+                                      DateFormat('EEEE, MMM d, h:mm a').format(
+                                        DateTime.fromMillisecondsSinceEpoch(
+                                          task['due_date'],
+                                        ),
+                                      ),
+                                      style: const TextStyle(
+                                        fontSize: AppConstants.valueDouble12,
+                                      ),
+                                    ),
+                                  SubtaskSection(
+                                    controller: controller,
+                                    task: task,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      if (task['is_completed'] != 1)
+                        GestureDetector(
+                          onTap: () {
+                            controller.toggleFavourite(
+                              task['id'],
+                              task['is_favourite'] ?? 0,
+                            );
+                          },
+                          child: Icon(
+                            task['is_favourite'] == 1
+                                ? Icons.star
+                                : Icons.star_border,
+                            color: task['is_favourite'] == 1
+                                ? Colors.blue
+                                : Colors.grey,
                           ),
                         ),
-                      ),
                     ],
                   ),
                 );
