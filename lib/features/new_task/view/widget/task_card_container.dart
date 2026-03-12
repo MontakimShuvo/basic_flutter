@@ -5,7 +5,7 @@ import '../../../../constants/app_colors_as.dart';
 import '../../../../widgets/bottom_sheet/common_bottom_sheet.dart';
 import '../../../home/view/widget/sort_bottom_sheet.dart';
 
-class TaskCardContainer extends StatelessWidget {
+class TaskCardContainer extends StatefulWidget {
   final String title;
   final List<Map<String, dynamic>> tasks;
   final NewTaskController controller;
@@ -18,11 +18,18 @@ class TaskCardContainer extends StatelessWidget {
   });
 
   @override
+  State<TaskCardContainer> createState() => _TaskCardContainerState();
+}
+
+class _TaskCardContainerState extends State<TaskCardContainer> {
+  bool isCompletedExpanded = false;
+
+  @override
   Widget build(BuildContext context) {
-    final pendingTasks = tasks
+    final pendingTasks = widget.tasks
         .where((task) => task['is_completed'] == 0)
         .toList();
-    final completeTasks = tasks
+    final completeTasks = widget.tasks
         .where((task) => task['is_completed'] == 1)
         .toList();
 
@@ -50,16 +57,16 @@ class TaskCardContainer extends StatelessWidget {
 
           if (pendingTasks.isNotEmpty)
             TaskItemWidget(
-              title: title,
-              controller: controller,
+              title: widget.title,
+              controller: widget.controller,
               tasks: pendingTasks,
-              onHeaderAction: (){
+              onHeaderAction: () {
                 CommonBottomSheet.show(
                   context: context,
                   body: SortBottomSheet(
-                    selectedSort: controller.currentSort,
+                    selectedSort: widget.controller.currentSort,
                     onSortSelected: (value) {
-                      controller.sortTasks(value);
+                      widget.controller.sortTasks(value);
                     },
                   ),
                 );
@@ -69,11 +76,16 @@ class TaskCardContainer extends StatelessWidget {
           if (completeTasks.isNotEmpty)
             TaskItemWidget(
               title: "Completed (${completeTasks.length})",
-              controller: controller,
+              controller: widget.controller,
               tasks: completeTasks,
-              headerAssetIcon: "assets/icons/ic_expand.png",
-              onHeaderAction: (){
-
+              headerAssetIcon: isCompletedExpanded 
+                  ? "assets/icons/ic_collapse.png" 
+                  : "assets/icons/ic_expand.png",
+              isExpanded: isCompletedExpanded,
+              onHeaderAction: () {
+                setState(() {
+                  isCompletedExpanded = !isCompletedExpanded;
+                });
               },
             ),
         ],
