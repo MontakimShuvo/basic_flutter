@@ -9,11 +9,13 @@ class HeaderSection extends StatelessWidget {
     required this.title,
     required this.controller,
     this.onSortTap,
+    this.assetIcon,
   });
 
   final String title;
   final NewTaskController controller;
   final VoidCallback? onSortTap;
+  final String? assetIcon;
 
   @override
   Widget build(BuildContext context) {
@@ -27,14 +29,15 @@ class HeaderSection extends StatelessWidget {
             fontWeight: FontWeight.bold,
           ),
         ),
-        GestureDetector(
-          onTap: onSortTap,
-          child: Image.asset(
-            'assets/icons/ic_sorting.png',
-            width: AppConstants.valueDouble20,
-            height: AppConstants.valueDouble20,
+        if (onSortTap != null)
+          GestureDetector(
+            onTap: onSortTap,
+            child: Image.asset(
+              assetIcon ?? 'assets/icons/ic_sorting.png',
+              width: AppConstants.valueDouble20,
+              height: AppConstants.valueDouble20,
+            ),
           ),
-        ),
       ],
     );
   }

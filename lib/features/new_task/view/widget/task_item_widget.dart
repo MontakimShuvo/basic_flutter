@@ -3,28 +3,28 @@ import 'package:intl/intl.dart';
 import 'package:untitled/features/new_task/view/widget/subtask_section.dart';
 
 import '../../../../constants/app_constants.dart';
-import '../../../../widgets/bottom_sheet/common_bottom_sheet.dart';
-import '../../../home/view/widget/sort_bottom_sheet.dart';
 import '../../../task_details/view/task_details_screen.dart';
 import '../../controller/new_task_controller.dart';
 import 'header_section.dart';
 
-class PendingTaskWidget extends StatelessWidget {
-  const PendingTaskWidget({
+class TaskItemWidget extends StatelessWidget {
+  const TaskItemWidget({
     super.key,
     required this.title,
     required this.controller,
     required this.tasks,
+    this.headerAssetIcon,
+    this.onHeaderAction,
   });
 
   final String title;
   final NewTaskController controller;
   final List<Map<String, dynamic>> tasks;
+  final String? headerAssetIcon;
+  final VoidCallback? onHeaderAction;
 
   @override
   Widget build(BuildContext context) {
-    // final pendingTasks = tasks.where((task) => task['is_completed'] == 0).toList();
-
     return Container(
       margin: const EdgeInsets.all(AppConstants.valueDouble16),
       padding: const EdgeInsets.all(AppConstants.valueDouble16),
@@ -35,17 +35,12 @@ class PendingTaskWidget extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          HeaderSection(title: title, controller: controller,onSortTap: (){
-            CommonBottomSheet.show(
-              context: context,
-              body: SortBottomSheet(
-                selectedSort: "my_order",
-                onSortSelected: (value) {
-                  controller.sortTasks(value);
-                },
-              ),
-            );
-          },),
+          HeaderSection(
+            title: title,
+            controller: controller,
+            onSortTap: onHeaderAction,
+            assetIcon: headerAssetIcon,
+          ),
           const SizedBox(height: AppConstants.valueDouble12),
           Column(
             children: tasks.map((task) {
@@ -60,9 +55,13 @@ class PendingTaskWidget extends StatelessWidget {
                       onTap: () {
                         controller.toggleTask(task['id'], task['is_completed']);
                       },
-                      child: const Icon(
-                        Icons.radio_button_unchecked,
-                        color: Colors.grey,
+                      child: Icon(
+                        task['is_completed'] == 1
+                            ? Icons.check_circle
+                            : Icons.radio_button_unchecked,
+                        color: task['is_completed'] == 1
+                            ? Colors.green
+                            : Colors.grey,
                       ),
                     ),
                     const SizedBox(width: AppConstants.valueDouble12),
@@ -82,8 +81,11 @@ class PendingTaskWidget extends StatelessWidget {
                           children: [
                             Text(
                               task['title'] ?? '',
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: AppConstants.valueDouble16,
+                                decoration: task['is_completed'] == 1
+                                    ? TextDecoration.lineThrough
+                                    : null,
                                 color: Colors.black,
                               ),
                             ),
@@ -119,7 +121,3 @@ class PendingTaskWidget extends StatelessWidget {
     );
   }
 }
-
-
-
-

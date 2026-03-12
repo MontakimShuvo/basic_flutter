@@ -1,16 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
-import 'package:untitled/constants/app_constants.dart';
-import 'package:untitled/data/model/subtask.dart';
 import 'package:untitled/features/new_task/controller/new_task_controller.dart';
-import 'package:untitled/features/new_task/view/widget/pending_task_widget.dart';
-import 'package:untitled/features/task_details/view/task_details_screen.dart';
-import 'package:untitled/features/task_details/view/widget/subtask_tile.dart';
-
+import 'package:untitled/features/new_task/view/widget/task_item_widget.dart';
 import '../../../../constants/app_colors_as.dart';
 import '../../../../widgets/bottom_sheet/common_bottom_sheet.dart';
 import '../../../home/view/widget/sort_bottom_sheet.dart';
-import 'complete_task_widget.dart';
 
 class TaskCardContainer extends StatelessWidget {
   final String title;
@@ -56,17 +49,32 @@ class TaskCardContainer extends StatelessWidget {
             ),
 
           if (pendingTasks.isNotEmpty)
-            PendingTaskWidget(
+            TaskItemWidget(
               title: title,
               controller: controller,
               tasks: pendingTasks,
+              onHeaderAction: (){
+                CommonBottomSheet.show(
+                  context: context,
+                  body: SortBottomSheet(
+                    selectedSort: controller.currentSort,
+                    onSortSelected: (value) {
+                      controller.sortTasks(value);
+                    },
+                  ),
+                );
+              },
             ),
 
           if (completeTasks.isNotEmpty)
-            CompleteTaskWidget(
-              title: title,
+            TaskItemWidget(
+              title: "Completed (${completeTasks.length})",
               controller: controller,
               tasks: completeTasks,
+              headerAssetIcon: "assets/icons/ic_expand.png",
+              onHeaderAction: (){
+
+              },
             ),
         ],
       ),
