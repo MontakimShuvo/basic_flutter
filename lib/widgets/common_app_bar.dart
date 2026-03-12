@@ -8,6 +8,7 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String? actionName;
   final List<Widget>? tabsTitle;
   final bool centerTitlePos;
+  final TabController? tabController;
   final void Function(BuildContext)? leadingIconAction;
   final void Function(BuildContext)? actionNameAction;
   final void Function(BuildContext)? addNewTask;
@@ -20,6 +21,7 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
     this.actionName,
     this.tabsTitle,
     this.centerTitlePos = true,
+    this.tabController,
     this.leadingIconAction,
     this.actionNameAction,
     this.addNewTask,
@@ -90,6 +92,7 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
       ],
       bottom: tabsTitle != null
           ? TabBar(
+              controller: tabController,
               isScrollable: true,
               tabs: tabsTitle!,
               onTap: (index) {

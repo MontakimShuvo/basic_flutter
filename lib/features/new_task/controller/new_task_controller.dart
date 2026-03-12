@@ -5,13 +5,14 @@ import '../../../data/model/subtask.dart';
 class NewTaskController extends ChangeNotifier {
   final int? id;
   final String taskName;
+  final bool isFavouriteTab;
   final List<Map<String, dynamic>> items = [];
   final DatabaseService _dbService = DatabaseService();
 
   List<Subtask> subtasks = [];
   String currentSort = "my_order";
 
-  NewTaskController({this.id, required this.taskName}) {
+  NewTaskController({this.id, required this.taskName, this.isFavouriteTab = false}) {
     loadTasks();
   }
 
@@ -39,14 +40,21 @@ class NewTaskController extends ChangeNotifier {
     await loadTasks();
   }
 
+  // lib/features/new_task/controller/new_task_controller.dart
+
   Future<void> loadTasks() async {
-    if (id != null) {
-      final tasks = await _dbService.getTasksByListId(id!);
-      items.clear();
-      items.addAll(tasks);
-      _applySort();
-      notifyListeners();
+    List<Map<String, dynamic>> tasks;
+    if (isFavouriteTab) {
+      // This SQL query should be: SELECT * FROM tasks WHERE is_favourite = 1
+      tasks = await _dbService.getFavouriteTasks();
+    } else {
+      tasks = await _dbService.getTasksByListId(id!);
     }
+
+    items.clear();
+    items.addAll(tasks);
+    _applySort();
+    notifyListeners(); // This rebuilds the NewTaskScreen UI
   }
 
   void sortTasks(String sortType) {

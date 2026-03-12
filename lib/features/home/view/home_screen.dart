@@ -1,5 +1,6 @@
-import 'package:flutter/material.dart';
+// lib/features/home/view/home_screen.dart
 
+import 'package:flutter/material.dart';
 import '../../../widgets/bottom_sheet/common_bottom_sheet.dart';
 import '../controller/home_controller.dart';
 import '../../../widgets/common_app_bar.dart';
@@ -20,24 +21,63 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   final HomeController _homeController = HomeController();
+  TabController? _tabController;
+
+  @override
+  void initState() {
+    super.initState();
+    // Initialize controller after the home controller loads initial lists
+    _setupTabController();
+    _homeController.addListener(_setupTabController);
+  }
+
+  void _setupTabController() {
+    final newLength = _homeController.tabsTitle.length;
+    if (_tabController == null || _tabController!.length != newLength) {
+      _tabController?.removeListener(_handleTabSelection);
+      _tabController?.dispose();
+
+      _tabController = TabController(
+        length: newLength,
+        vsync: this,
+        initialIndex: (newLength - 2).clamp(0, newLength - 1),
+      );
+      _tabController!.addListener(_handleTabSelection);
+    }
+  }
+
+  void _handleTabSelection() {
+    if (_tabController != null && !_tabController!.indexIsChanging) {
+      // Find the index of the Favorites tab
+      final favIndex = _homeController.taskControllers
+          .indexWhere((c) => c.isFavouriteTab);
+
+      // If the selected tab is the Favorites tab, refresh its data
+      if (_tabController!.index == favIndex && favIndex != -1) {
+        _homeController.taskControllers[favIndex].loadTasks();
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    _homeController.removeListener(_setupTabController);
+    _tabController?.removeListener(_handleTabSelection);
+    _tabController?.dispose();
+    super.dispose();
+  }
 
   void _gotoCreateTaskScreen(BuildContext context) async {
-    // Get the current TabController to remember the active index
-    final controller = DefaultTabController.of(context);
-    final previousIndex = controller.index-1;
-
     final result = await Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => const CreateNewTabScreen()),
     );
 
     if (result != null && result is String && context.mounted) {
-      _homeController.addNewTask(result);
-    } else {
-      // If no task was created, animate back to the previous tab
-      controller.animateTo(previousIndex);
+      await _homeController.addNewTask(result);
+      // The _setupTabController listener will handle updating _tabController length
     }
   }
 
@@ -46,52 +86,45 @@ class _HomeScreenState extends State<HomeScreen> {
     return ListenableBuilder(
       listenable: _homeController,
       builder: (context, child) {
-        return DefaultTabController(
-          key: ValueKey(_homeController.taskCount),
-          initialIndex: (_homeController.taskCount - 1).clamp(0, 1000),
-          length: _homeController.tabsTitle.length,
-          child: Builder(
-            builder: (context) {
-              final controller = DefaultTabController.of(context);
+        if (_tabController == null) return const Scaffold();
 
-              return Scaffold(
-                appBar: CommonAppBar(
-                  title: widget.title,
-                  trailingIcon: widget.trailingIcon,
-                  tabsTitle: _homeController.tabsTitle,
-                  addNewTask: (ctx) => _gotoCreateTaskScreen(ctx),
-                ),
-                backgroundColor: Colors.white,
-                body: TabBarView(children: _homeController.tabBarView),
-                floatingActionButton: FloatingActionButton(
-                  onPressed: () {
-                    CommonBottomSheet.show(
-                      context: context,
-                      body: TaskInfo(
-                        homeController: _homeController,
-                        onDone: (title, details, date) {
-                          if (title.isNotEmpty) {
-                            final index = controller.index;
-                            if (index < _homeController.taskControllers.length) {
-                              _homeController.taskControllers[index].addItem(
-                                taskTitle: title,
-                                notes: details,
-                                dueDate: date,
-                              );
-                              _homeController.taskTitleController.clear();
-                              _homeController.taskDetailsController.clear();
-                              Navigator.pop(context);
-                            }
-                          }
-                        },
-                      ),
-                    );
+        return Scaffold(
+          appBar: CommonAppBar(
+            title: widget.title,
+            trailingIcon: widget.trailingIcon,
+            tabsTitle: _homeController.tabsTitle,
+            tabController: _tabController, // Pass the controller to your AppBar
+            addNewTask: (ctx) => _gotoCreateTaskScreen(ctx),
+          ),
+          backgroundColor: Colors.white,
+          body: TabBarView(
+            controller: _tabController,
+            children: _homeController.tabBarView,
+          ),
+          floatingActionButton: FloatingActionButton(
+            onPressed: () {
+              CommonBottomSheet.show(
+                context: context,
+                body: TaskInfo(
+                  homeController: _homeController,
+                  onDone: (title, details, date) {
+                    if (title.isNotEmpty) {
+                      final index = _tabController!.index;
+                      if (index < _homeController.taskControllers.length) {
+                        _homeController.taskControllers[index].addItem(
+                          taskTitle: title,
+                          notes: details,
+                          dueDate: date,
+                        );
+                        Navigator.pop(context);
+                      }
+                    }
                   },
-                  backgroundColor: Colors.blue,
-                  child: const Icon(Icons.add, color: Colors.white),
                 ),
               );
             },
+            backgroundColor: Colors.blue,
+            child: const Icon(Icons.add, color: Colors.white),
           ),
         );
       },

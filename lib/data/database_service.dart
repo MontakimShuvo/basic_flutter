@@ -164,4 +164,15 @@ class DatabaseService {
       whereArgs: [id],
     );
   }
+
+
+  Future<List<Map<String, dynamic>>> getFavouriteTasks() async {
+    Database db = await database;
+    return await db.query(
+      'tasks',
+      where: 'is_favourite = ?',
+      whereArgs: [1],
+      orderBy: 'created_at DESC',
+    );
+  }
 }
