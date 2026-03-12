@@ -169,7 +169,6 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
                                     child: CommonInputField(
                                       controller: _controller.notesController,
                                       hintText: "Add description",
-                                      maxLines: null,
                                       style: const TextStyle(fontSize: 16),
                                     ),
                                   ),

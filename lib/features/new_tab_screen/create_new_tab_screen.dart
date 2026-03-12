@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../widgets/common_app_bar.dart';
-import '../../widgets/text_field/input_text_field.dart';
+import '../../widgets/text_field/common_input_field.dart';
 
 class CreateNewTabScreen extends StatefulWidget {
   const CreateNewTabScreen({super.key});
@@ -43,7 +43,30 @@ class _CreateNewTabScreenState extends State<CreateNewTabScreen> {
         centerTitlePos: false,
       ),
       backgroundColor: Colors.white,
-      body: searchField(controller: _controller),
+      body: Padding(
+        padding: const EdgeInsets.only(top: 40, left: 20, right: 20),
+        child: CommonInputField(
+          controller: _controller,
+          hintText: "Enter list title",
+          autofocus: true,
+          inputDecoration: InputDecoration(
+            filled: true,
+            fillColor: Colors.white,
+            contentPadding: const EdgeInsets.all(15),
+            hintText: "Enter list title",
+            hintStyle: const TextStyle(
+              color: Color(0xffDDDADA),
+              fontSize: 14,
+            ),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10),
+              borderSide: BorderSide(
+                color: Colors.red
+              ),
+            ),
+          ),
+        ),
+      ),
     );
   }
 }
