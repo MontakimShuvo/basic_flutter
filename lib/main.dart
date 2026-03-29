@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:untitled/di/injector.dart';
 import 'package:untitled/features/home/view/home_screen.dart';
 import 'package:untitled/utils/size_config.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  setupInjector();
   runApp(const MyApp());
 }
 

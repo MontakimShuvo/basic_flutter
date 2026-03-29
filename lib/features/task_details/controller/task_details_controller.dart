@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
-import '../../../data/database_service.dart';
+import 'package:untitled/di/injector.dart';
+import '../../../data/services/database_service.dart';
 import '../../../data/model/subtask.dart';
 
 class TaskDetailsController extends ChangeNotifier {
   final Map<String, dynamic> task;
-  final DatabaseService _dbService = DatabaseService();
+  final DatabaseService _dbService = resolve<DatabaseService>();
 
   late TextEditingController notesController;
   DateTime? selectedDueDate;

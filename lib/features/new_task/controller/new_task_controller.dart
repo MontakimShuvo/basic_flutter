@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../../data/database_service.dart';
+import 'package:untitled/di/injector.dart';
+import '../../../data/services/database_service.dart';
 import '../../../data/model/subtask.dart';
 
 class NewTaskController extends ChangeNotifier {
@@ -7,7 +8,7 @@ class NewTaskController extends ChangeNotifier {
   final String taskName;
   final bool isFavouriteTab;
   final List<Map<String, dynamic>> items = [];
-  final DatabaseService _dbService = DatabaseService();
+  final DatabaseService _dbService = resolve<DatabaseService>();
 
   List<Subtask> subtasks = [];
   String currentSort = "my_order";

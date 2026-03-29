@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
-import '../../../data/database_service.dart';
+import 'package:untitled/di/injector.dart';
+import '../../../data/services/database_service.dart';
 import '../../new_task/view/new_task_screen.dart';
 import '../../../widgets/tab_item.dart';
 import '../../new_task/controller/new_task_controller.dart';
 
 class HomeController extends ChangeNotifier {
   final List<NewTaskController> taskControllers = [];
-  final DatabaseService _dbService = DatabaseService();
+  final DatabaseService _dbService = resolve<DatabaseService>();
 
   var taskTitleController = TextEditingController();
   var taskDetailsController = TextEditingController();

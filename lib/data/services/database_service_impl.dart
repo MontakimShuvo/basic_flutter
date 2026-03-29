@@ -1,13 +1,14 @@
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
+import 'database_service.dart';
 
-class DatabaseService {
-  static final DatabaseService _instance = DatabaseService._internal();
+class DatabaseServiceImpl implements DatabaseService {
+  static final DatabaseServiceImpl _instance = DatabaseServiceImpl._internal();
   static Database? _database;
 
-  factory DatabaseService() => _instance;
+  factory DatabaseServiceImpl() => _instance;
 
-  DatabaseService._internal();
+  DatabaseServiceImpl._internal();
 
   Future<Database> get database async {
     if (_database != null) return _database!;
@@ -64,17 +65,19 @@ class DatabaseService {
     ''');
   }
 
-
+  @override
   Future<int> createTaskList(Map<String, dynamic> row) async {
     Database db = await database;
     return await db.insert('task_lists', row);
   }
 
+  @override
   Future<List<Map<String, dynamic>>> getTaskLists() async {
     Database db = await database;
     return await db.query('task_lists', orderBy: 'position ASC');
   }
 
+  @override
   Future<int> updateTaskList(int id, Map<String, dynamic> row) async {
     Database db = await database;
     return await db.update(
@@ -85,6 +88,7 @@ class DatabaseService {
     );
   }
 
+  @override
   Future<int> deleteTaskList(int id) async {
     Database db = await database;
     return await db.delete(
@@ -94,12 +98,13 @@ class DatabaseService {
     );
   }
 
-
+  @override
   Future<int> createTask(Map<String, dynamic> row) async {
     Database db = await database;
     return await db.insert('tasks', row);
   }
 
+  @override
   Future<List<Map<String, dynamic>>> getTasksByListId(int listId) async {
     Database db = await database;
     return await db.query(
@@ -110,6 +115,7 @@ class DatabaseService {
     );
   }
 
+  @override
   Future<int> updateTask(int id, Map<String, dynamic> row) async {
     Database db = await database;
     return await db.update(
@@ -120,6 +126,7 @@ class DatabaseService {
     );
   }
 
+  @override
   Future<int> deleteTask(int id) async {
     Database db = await database;
     return await db.delete(
@@ -129,13 +136,13 @@ class DatabaseService {
     );
   }
 
-  // --- Subtasks CRUD ---
-
+  @override
   Future<int> createSubtask(Map<String, dynamic> row) async {
     Database db = await database;
     return await db.insert('subtasks', row);
   }
 
+  @override
   Future<List<Map<String, dynamic>>> getSubtasksByTaskId(int taskId) async {
     Database db = await database;
     return await db.query(
@@ -146,6 +153,7 @@ class DatabaseService {
     );
   }
 
+  @override
   Future<int> updateSubtask(int id, Map<String, dynamic> row) async {
     Database db = await database;
     return await db.update(
@@ -156,6 +164,7 @@ class DatabaseService {
     );
   }
 
+  @override
   Future<int> deleteSubtask(int id) async {
     Database db = await database;
     return await db.delete(
@@ -165,7 +174,7 @@ class DatabaseService {
     );
   }
 
-
+  @override
   Future<List<Map<String, dynamic>>> getFavouriteTasks() async {
     Database db = await database;
     return await db.query(
