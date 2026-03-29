@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:untitled/features/home/view/widget/sort_option.dart';
 import '../../../../constants/app_constants.dart';
 
 class SortBottomSheet extends StatelessWidget {
@@ -37,45 +38,47 @@ class SortBottomSheet extends StatelessWidget {
               ),
             ),
           ),
-          _sortOption(context, "My order", "my_order"),
-          _sortOption(context, "Date", "date"),
-          _sortOption(context, "Deadline", "dead_line"),
-          _sortOption(context, "Title", "title"),
+          SortOption(
+            title: "My order",
+            value: "my_order",
+            isSelected: selectedSort == "my_order",
+            onTap: () {
+              onSortSelected("my_order");
+              Navigator.pop(context);
+            },
+          ),
+          SortOption(
+            title: "Date",
+            value: "date",
+            isSelected: selectedSort == "date",
+            onTap: () {
+              onSortSelected("date");
+              Navigator.pop(context);
+            },
+          ),
+          SortOption(
+            title: "Deadline",
+            value: "dead_line",
+            isSelected: selectedSort == "dead_line",
+            onTap: () {
+              onSortSelected("dead_line");
+              Navigator.pop(context);
+            },
+          ),
+          SortOption(
+            title: "Title",
+            value: "title",
+            isSelected: selectedSort == "title",
+            onTap: () {
+              onSortSelected("title");
+              Navigator.pop(context);
+            },
+          ),
           const SizedBox(height: AppConstants.valueDouble10),
         ],
       ),
     );
   }
-
-  Widget _sortOption(BuildContext context, String title, String value) {
-    final isSelected = selectedSort == value;
-    return InkWell(
-      onTap: () {
-        onSortSelected(value);
-        Navigator.pop(context);
-      },
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: AppConstants.valueDouble12, horizontal: AppConstants.valueDouble12),
-        child: Row(
-          children: [
-            SizedBox(
-              width: AppConstants.valueDouble24,
-              child: isSelected
-                  ? const Icon(Icons.check, size: AppConstants.valueDouble20, color: Colors.black87)
-                  : null,
-            ),
-            const SizedBox(width: AppConstants.valueDouble12),
-            Text(
-              title,
-              style: const TextStyle(
-                fontSize: AppConstants.valueDouble16,
-                fontWeight: FontWeight.w400,
-                color: Colors.black87,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
 }
+
+
