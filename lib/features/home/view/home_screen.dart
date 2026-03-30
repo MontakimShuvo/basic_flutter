@@ -53,10 +53,16 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       // Find the index of the Favorites tab
       final favIndex = _homeController.taskControllers
           .indexWhere((c) => c.isFavouriteTab);
+      final currentIndex = _tabController!.index;
 
-      // If the selected tab is the Favorites tab, refresh its data
+
+      // If the selected tab is the Favorites tab or other, refresh its data
       if (_tabController!.index == favIndex && favIndex != -1) {
         _homeController.taskControllers[favIndex].loadTasks();
+      }else{
+        if (currentIndex < _homeController.taskControllers.length) {
+          _homeController.taskControllers[currentIndex].loadTasks();
+        }
       }
     }
   }
@@ -77,6 +83,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
     if (result != null && result is String && context.mounted) {
       await _homeController.addNewTask(result);
+      // Add new tab task
       // The _setupTabController listener will handle updating _tabController length
     }
   }
