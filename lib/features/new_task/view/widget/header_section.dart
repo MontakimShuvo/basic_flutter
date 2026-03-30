@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:untitled/features/home/view/widget/list_options_bottom_sheet.dart';
 import 'package:untitled/widgets/bottom_sheet/common_bottom_sheet.dart';
+import 'package:untitled/widgets/common_dialog.dart';
 
 import '../../../../constants/app_constants.dart';
 import '../../controller/new_task_controller.dart';
@@ -21,6 +22,23 @@ class HeaderSection extends StatelessWidget {
   final VoidCallback? onRenameTap;
   final String? assetIcon;
 
+  void showDeleteDialog(BuildContext context, {required VoidCallback onDelete}) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return CommonDialog(
+          title: "Delete this list?",
+          content: "All tasks in this list will be permanently deleted",
+          onCancel: () => Navigator.pop(context),
+          onDelete: () {
+            Navigator.pop(context);
+            onDelete();
+          },
+        );
+      },
+    );
+  }
+
   void _showOptions(BuildContext context) {
     CommonBottomSheet.show(
       context: context,
@@ -29,7 +47,9 @@ class HeaderSection extends StatelessWidget {
           onRenameTap?.call();
         },
         onDelete: () {
-          // TODO: Implement delete logic
+          showDeleteDialog(context, onDelete: () {
+            controller.deleteList();
+          });
         },
       ),
     );

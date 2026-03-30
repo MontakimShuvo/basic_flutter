@@ -29,7 +29,7 @@ class CommonDialog extends StatelessWidget {
       title: Text(
         title,
         style: const TextStyle(
-          fontSize: AppConstants.valueDouble20,
+          fontSize: AppConstants.valueDouble16,
           fontWeight: FontWeight.w500,
           color: Colors.black,
         ),
@@ -44,7 +44,7 @@ class CommonDialog extends StatelessWidget {
       contentPadding: const EdgeInsets.fromLTRB(
         AppConstants.valueDouble24,
         AppConstants.valueDouble20,
-        AppConstants.valueDouble24,
+        AppConstants.valueDouble20,
         AppConstants.valueDouble24,
       ),
       actions: [

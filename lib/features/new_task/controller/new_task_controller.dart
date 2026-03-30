@@ -9,11 +9,17 @@ class NewTaskController extends ChangeNotifier {
   final bool isFavouriteTab;
   final List<Map<String, dynamic>> items = [];
   final DatabaseService _dbService = resolve<DatabaseService>();
+  final VoidCallback? onDeleteList;
 
   List<Subtask> subtasks = [];
   String currentSort = "my_order";
 
-  NewTaskController({this.id, required this.taskName, this.isFavouriteTab = false}) {
+  NewTaskController({
+    this.id,
+    required this.taskName,
+    this.isFavouriteTab = false,
+    this.onDeleteList,
+  }) {
     loadTasks();
   }
 
@@ -41,21 +47,27 @@ class NewTaskController extends ChangeNotifier {
     await loadTasks();
   }
 
-  // lib/features/new_task/controller/new_task_controller.dart
-
   Future<void> loadTasks() async {
     List<Map<String, dynamic>> tasks;
     if (isFavouriteTab) {
-      // This SQL query should be: SELECT * FROM tasks WHERE is_favourite = 1
       tasks = await _dbService.getFavouriteTasks();
-    } else {
+    } else if (id != null) {
       tasks = await _dbService.getTasksByListId(id!);
+    } else {
+      return;
     }
 
     items.clear();
     items.addAll(tasks);
     _applySort();
-    notifyListeners(); // This rebuilds the NewTaskScreen UI
+    notifyListeners();
+  }
+
+  Future<void> deleteList() async {
+    if (id != null && !isFavouriteTab) {
+      await _dbService.deleteTaskList(id!);
+      onDeleteList?.call();
+    }
   }
 
   void sortTasks(String sortType) {

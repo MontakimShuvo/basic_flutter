@@ -27,7 +27,8 @@ class HomeController extends ChangeNotifier {
         taskControllers.add(NewTaskController(
           id: list['id'],
           taskName: list['name'],
-          isFavouriteTab: list['name'] == "Favorites"
+          isFavouriteTab: list['name'] == "Favorites",
+          onDeleteList: ()=>_loadTaskLists()
         ));
       }
       notifyListeners();
