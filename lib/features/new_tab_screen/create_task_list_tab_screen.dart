@@ -3,14 +3,14 @@ import 'package:flutter/material.dart';
 import '../../widgets/common_app_bar.dart';
 import '../../widgets/text_field/common_input_field.dart';
 
-class CreateNewTabScreen extends StatefulWidget {
-  const CreateNewTabScreen({super.key});
+class CreateTaskListTabScreen extends StatefulWidget {
+  const CreateTaskListTabScreen({super.key});
 
   @override
-  State<CreateNewTabScreen> createState() => _CreateNewTabScreenState();
+  State<CreateTaskListTabScreen> createState() => _CreateTaskListTabScreenState();
 }
 
-class _CreateNewTabScreenState extends State<CreateNewTabScreen> {
+class _CreateTaskListTabScreenState extends State<CreateTaskListTabScreen> {
   final TextEditingController _controller = TextEditingController();
 
   void _backButtonAction(BuildContext context) {

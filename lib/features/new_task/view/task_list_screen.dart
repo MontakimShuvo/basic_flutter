@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import '../controller/new_task_controller.dart';
 import 'widget/task_card_container.dart';
 
-class NewTaskScreen extends StatelessWidget {
+class TaskListScreen extends StatelessWidget {
   final NewTaskController controller;
-  const NewTaskScreen({super.key, required this.controller});
+  const TaskListScreen({super.key, required this.controller});
 
   @override
   Widget build(BuildContext context) {

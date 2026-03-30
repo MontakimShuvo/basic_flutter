@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import '../../../widgets/bottom_sheet/common_bottom_sheet.dart';
 import '../controller/home_controller.dart';
 import '../../../widgets/common_app_bar.dart';
-import '../../new_tab_screen/create_new_tab_screen.dart';
+import '../../new_tab_screen/create_task_list_tab_screen.dart';
 import 'widget/task_info.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -78,7 +78,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   void _gotoCreateTaskScreen(BuildContext context) async {
     final result = await Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => const CreateNewTabScreen()),
+      MaterialPageRoute(builder: (context) => const CreateTaskListTabScreen()),
     );
 
     if (result != null && result is String && context.mounted) {

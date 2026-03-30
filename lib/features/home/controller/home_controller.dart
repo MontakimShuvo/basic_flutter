@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:untitled/di/injector.dart';
 import '../../../data/services/database_service.dart';
-import '../../new_task/view/new_task_screen.dart';
+import '../../new_task/view/task_list_screen.dart';
 import '../../../widgets/tab_item.dart';
 import '../../new_task/controller/new_task_controller.dart';
 
@@ -74,7 +74,7 @@ class HomeController extends ChangeNotifier {
   List<Widget> get tabBarView {
     List<Widget> views = [];
     for (var controller in taskControllers) {
-      views.add(NewTaskScreen(controller: controller));
+      views.add(TaskListScreen(controller: controller));
     }
     // Add a placeholder for the "+ new task" tab view
     views.add(const Center(child: Text("Click + to add a task")));
