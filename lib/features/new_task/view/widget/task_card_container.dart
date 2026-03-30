@@ -9,12 +9,14 @@ class TaskCardContainer extends StatefulWidget {
   final String title;
   final List<Map<String, dynamic>> tasks;
   final NewTaskController controller;
+  final VoidCallback onRenameTap;
 
   const TaskCardContainer({
     super.key,
     required this.title,
     required this.tasks,
     required this.controller,
+    required this.onRenameTap,
   });
 
   @override
@@ -71,6 +73,7 @@ class _TaskCardContainerState extends State<TaskCardContainer> {
                   ),
                 );
               },
+                onRenameTap: widget.onRenameTap,
             ),
 
           if (completeTasks.isNotEmpty)
@@ -82,6 +85,7 @@ class _TaskCardContainerState extends State<TaskCardContainer> {
                   ? "assets/icons/ic_collapse.png" 
                   : "assets/icons/ic_expand.png",
               isExpanded: isCompletedExpanded,
+              onRenameTap: widget.onRenameTap,
               onHeaderAction: () {
                 setState(() {
                   isCompletedExpanded = !isCompletedExpanded;

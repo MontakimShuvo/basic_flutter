@@ -1,17 +1,31 @@
 import 'package:flutter/material.dart';
-
 import '../../widgets/common_app_bar.dart';
 import '../../widgets/text_field/common_input_field.dart';
 
 class CreateTaskListTabScreen extends StatefulWidget {
-  const CreateTaskListTabScreen({super.key});
+  final int? listId;
+  final String? existingName;
+
+  const CreateTaskListTabScreen({
+    super.key,
+    this.listId,
+    this.existingName,
+  });
+
+  bool get isEditMode => listId != null;
 
   @override
   State<CreateTaskListTabScreen> createState() => _CreateTaskListTabScreenState();
 }
 
 class _CreateTaskListTabScreenState extends State<CreateTaskListTabScreen> {
-  final TextEditingController _controller = TextEditingController();
+  late final TextEditingController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = TextEditingController(text: widget.existingName);
+  }
 
   void _backButtonAction(BuildContext context) {
     Navigator.pop(context);
@@ -19,7 +33,10 @@ class _CreateTaskListTabScreenState extends State<CreateTaskListTabScreen> {
 
   void _doneAction(BuildContext context) {
     if (_controller.text.isNotEmpty) {
-      Navigator.pop(context, _controller.text);
+      Navigator.pop(context, {
+        'id': widget.listId,
+        'name': _controller.text,
+      });
     }
   }
 
@@ -33,7 +50,7 @@ class _CreateTaskListTabScreenState extends State<CreateTaskListTabScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CommonAppBar(
-        title: "Create New Task",
+        title: widget.isEditMode ? "Rename list" : "Create New Task",
         leadingIcon: "assets/icons/Arrow - Left 2.svg",
         trailingIcon: null,
         tabsTitle: null,
@@ -60,8 +77,8 @@ class _CreateTaskListTabScreenState extends State<CreateTaskListTabScreen> {
             ),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
-              borderSide: BorderSide(
-                color: Colors.red
+              borderSide: const BorderSide(
+                color: Colors.blue,
               ),
             ),
           ),

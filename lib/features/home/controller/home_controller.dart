@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:untitled/di/injector.dart';
+import 'package:untitled/features/new_tab_screen/create_task_list_tab_screen.dart';
 import '../../../data/services/database_service.dart';
 import '../../new_task/view/task_list_screen.dart';
 import '../../../widgets/tab_item.dart';
@@ -16,11 +17,9 @@ class HomeController extends ChangeNotifier {
     _loadTaskLists();
   }
 
-  // Load existing lists from DB on startup
   Future<void> _loadTaskLists() async {
     final lists = await _dbService.getTaskLists();
     if (lists.isEmpty) {
-      // Create default Favorites if DB is empty
       await addNewTask("Favorites");
     } else {
       taskControllers.clear();
@@ -36,23 +35,25 @@ class HomeController extends ChangeNotifier {
   }
 
   Future<void> addNewTask(String taskName) async {
-    // 1. Prepare data for SQLite
     final newList = {
       'name': taskName,
       'position': taskControllers.length,
       'created_at': DateTime.now().millisecondsSinceEpoch,
     };
 
-    // 2. Perform DB Operation: INSERT
     final id = await _dbService.createTaskList(newList);
 
-    // 3. Update local state
     taskControllers.add(NewTaskController(
       id: id,
       taskName: taskName,
     ));
 
     notifyListeners();
+  }
+
+  Future<void> updateTaskList(int id, String newName) async {
+    await _dbService.updateTaskList(id, {'name': newName});
+    await _loadTaskLists();
   }
 
   int get taskCount => taskControllers.length;
@@ -66,18 +67,48 @@ class HomeController extends ChangeNotifier {
         count: taskControllers[i].items.length,
       ));
     }
-    // Add the "+ new task" tab at the end
     titles.add(TabItem(index: taskControllers.length, title: '+ new list', count: 0));
     return titles;
   }
 
-  List<Widget> get tabBarView {
+  List<Widget> getTabBarView(BuildContext context) {
     List<Widget> views = [];
     for (var controller in taskControllers) {
-      views.add(TaskListScreen(controller: controller));
+      views.add(
+          TaskListScreen(
+            controller: controller,
+            onRenameTap: () => gotoCreateTaskScreen(
+                context,
+                id: controller.id,
+                name: controller.taskName
+            ),
+          )
+      );
     }
-    // Add a placeholder for the "+ new task" tab view
     views.add(const Center(child: Text("Click + to add a task")));
     return views;
+  }
+
+  void gotoCreateTaskScreen(BuildContext context, {int? id, String? name}) async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => CreateTaskListTabScreen(
+          listId: id,
+          existingName: name,
+        ),
+      ),
+    );
+
+    if (result != null && result is Map && context.mounted) {
+      final listId = result['id'];
+      final listName = result['name'];
+
+      if (listId != null) {
+        await updateTaskList(listId, listName);
+      } else {
+        await addNewTask(listName);
+      }
+    }
   }
 }

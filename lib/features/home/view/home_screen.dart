@@ -75,18 +75,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     super.dispose();
   }
 
-  void _gotoCreateTaskScreen(BuildContext context) async {
-    final result = await Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => const CreateTaskListTabScreen()),
-    );
+  // Update in lib/features/home/view/home_screen.dart
 
-    if (result != null && result is String && context.mounted) {
-      await _homeController.addNewTask(result);
-      // Add new tab task
-      // The _setupTabController listener will handle updating _tabController length
-    }
-  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -101,12 +92,12 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             trailingIcon: widget.trailingIcon,
             tabsTitle: _homeController.tabsTitle,
             tabController: _tabController, // Pass the controller to your AppBar
-            addNewTask: (ctx) => _gotoCreateTaskScreen(ctx),
+            addNewTask: (ctx) => _homeController.gotoCreateTaskScreen(ctx),
           ),
           backgroundColor: Colors.white,
           body: TabBarView(
             controller: _tabController,
-            children: _homeController.tabBarView,
+            children: _homeController.getTabBarView(context),
           ),
           floatingActionButton: FloatingActionButton(
             onPressed: () {
