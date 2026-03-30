@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:untitled/features/new_task/view/widget/subtask_section.dart';
+import 'package:untitled/features/task_details/view/task_details_screen.dart';
 import '../../../../constants/app_constants.dart';
 import '../../controller/new_task_controller.dart';
 import 'header_section.dart';
@@ -25,56 +28,133 @@ class TaskItemWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-          child: HeaderSection(
+    return Container(
+      margin: const EdgeInsets.all(AppConstants.valueDouble16),
+      padding: const EdgeInsets.all(AppConstants.valueDouble16),
+      decoration: BoxDecoration(
+        color: const Color(0xFFEFEFF1),
+        borderRadius: BorderRadius.circular(AppConstants.valueDouble20),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          HeaderSection(
             title: title,
             controller: controller,
             onSortTap: onHeaderAction,
             onRenameTap: onRenameTap,
             assetIcon: headerAssetIcon,
           ),
-        ),
-        if (isExpanded)
-          ListView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: tasks.length,
-            itemBuilder: (context, index) {
-              final task = tasks[index];
-              return ListTile(
-                leading: IconButton(
-                  icon: Icon(
-                    task['is_completed'] == 1
-                        ? Icons.check_circle
-                        : Icons.radio_button_unchecked,
-                    color: task['is_completed'] == 1 ? Colors.blue : Colors.grey,
+          if (isExpanded) ...[
+            // Conditional rendering
+            const SizedBox(height: AppConstants.valueDouble12),
+            Column(
+              children: tasks.map((task) {
+                return Padding(
+                  padding: const EdgeInsets.symmetric(
+                    vertical: AppConstants.valueDouble8,
                   ),
-                  onPressed: () => controller.toggleTask(task['id'], task['is_completed']),
-                ),
-                title: Text(
-                  task['title'],
-                  style: TextStyle(
-                    decoration: task['is_completed'] == 1
-                        ? TextDecoration.lineThrough
-                        : null,
-                    color: task['is_completed'] == 1 ? Colors.grey : Colors.black,
+                  child: Row(
+                    crossAxisAlignment: .start,
+                    mainAxisAlignment: .spaceBetween,
+                    children: [
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          GestureDetector(
+                            onTap: () {
+                              controller.toggleTask(
+                                task['id'],
+                                task['is_completed'],
+                              );
+                            },
+                            child: Icon(
+                              task['is_completed'] == 1
+                                  ? Icons.check_circle
+                                  : Icons.radio_button_unchecked,
+                              color: task['is_completed'] == 1
+                                  ? Colors.green
+                                  : Colors.grey,
+                            ),
+                          ),
+                          const SizedBox(width: AppConstants.valueDouble12),
+                          GestureDetector(
+                            onTap: () async {
+                              await Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      TaskDetailsScreen(task: task),
+                                ),
+                              );
+                              controller.loadTasks();
+                            },
+                            child: Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    task['title'] ?? '',
+                                    style: TextStyle(
+                                      fontSize: AppConstants.valueDouble16,
+                                      decoration: task['is_completed'] == 1
+                                          ? TextDecoration.lineThrough
+                                          : null,
+                                      color: Colors.black,
+                                    ),
+                                  ),
+                                  Text(
+                                    task['notes'] ?? '',
+                                    style: const TextStyle(
+                                      fontSize: AppConstants.valueDouble12,
+                                    ),
+                                  ),
+                                  if (task['due_date'] != null)
+                                    Text(
+                                      DateFormat('EEEE, MMM d, h:mm a').format(
+                                        DateTime.fromMillisecondsSinceEpoch(
+                                          task['due_date'],
+                                        ),
+                                      ),
+                                      style: const TextStyle(
+                                        fontSize: AppConstants.valueDouble12,
+                                      ),
+                                    ),
+                                  SubtaskSection(
+                                    controller: controller,
+                                    task: task,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      if (task['is_completed'] != 1)
+                        GestureDetector(
+                          onTap: () {
+                            controller.toggleFavourite(
+                              task['id'],
+                              task['is_favourite'] ?? 0,
+                            );
+                          },
+                          child: Icon(
+                            task['is_favourite'] == 1
+                                ? Icons.star
+                                : Icons.star_border,
+                            color: task['is_favourite'] == 1
+                                ? Colors.blue
+                                : Colors.grey,
+                          ),
+                        ),
+                    ],
                   ),
-                ),
-                trailing: IconButton(
-                  icon: Icon(
-                    task['is_favourite'] == 1 ? Icons.star : Icons.star_border,
-                    color: task['is_favourite'] == 1 ? Colors.orange : Colors.grey,
-                  ),
-                  onPressed: () => controller.toggleFavourite(task['id'], task['is_favourite']),
-                ),
-              );
-            },
-          ),
-      ],
+                );
+              }).toList(),
+            ),
+          ],
+        ],
+      ),
     );
   }
 }
