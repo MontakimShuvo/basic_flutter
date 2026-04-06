@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:untitled/features/new_task/view/widget/subtask_section.dart';
-import 'package:untitled/features/task_details/view/task_details_screen.dart';
+import 'package:untitled/routes/app_routes.dart';
 import '../../../../constants/app_constants.dart';
 import '../../controller/new_task_controller.dart';
 import 'header_section.dart';
@@ -80,12 +81,9 @@ class TaskItemWidget extends StatelessWidget {
                           const SizedBox(width: AppConstants.valueDouble12),
                           GestureDetector(
                             onTap: () async {
-                              await Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) =>
-                                      TaskDetailsScreen(task: task),
-                                ),
+                              await Get.toNamed(
+                                AppRoutes.taskDetails,
+                                arguments: task,
                               );
                               controller.loadTasks();
                             },

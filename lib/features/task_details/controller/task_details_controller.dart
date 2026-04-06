@@ -1,27 +1,32 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:untitled/di/injector.dart';
 import '../../../data/services/database_service.dart';
 import '../../../data/model/subtask.dart';
 
-class TaskDetailsController extends ChangeNotifier {
+class TaskDetailsController extends GetxController {
   final Map<String, dynamic> task;
   final DatabaseService _dbService = resolve<DatabaseService>();
 
   late TextEditingController notesController;
-  DateTime? selectedDueDate;
-  List<Subtask> subtasks = [];
+  final selectedDueDate = Rxn<DateTime>();
+  final subtasks = <Subtask>[].obs;
 
-  TaskDetailsController({required this.task}) {
+  TaskDetailsController({required this.task});
+
+  @override
+  void onInit() {
+    super.onInit();
     notesController = TextEditingController(text: task['notes']);
     if (task['due_date'] != null) {
-      selectedDueDate = DateTime.fromMillisecondsSinceEpoch(task['due_date']);
+      selectedDueDate.value = DateTime.fromMillisecondsSinceEpoch(task['due_date']);
     }
     _loadSubtasks();
   }
 
   Future<void> _loadSubtasks() async {
     final List<Map<String, dynamic>> maps = await _dbService.getSubtasksByTaskId(task['id']);
-    subtasks = maps.map((map) {
+    subtasks.value = maps.map((map) {
       return Subtask(
         id: map['id'],
         title: map['title'],
@@ -29,55 +34,41 @@ class TaskDetailsController extends ChangeNotifier {
         controller: TextEditingController(text: map['title']),
       );
     }).toList();
-    notifyListeners();
   }
 
   void updateDueDate(DateTime date) {
-    selectedDueDate = date;
-    notifyListeners();
+    selectedDueDate.value = date;
   }
 
   void addSubtask() {
-
     subtasks.add(Subtask(
       title: '',
       controller: TextEditingController(),
     ));
-    notifyListeners();
   }
 
   void removeSubtask(int index) {
     subtasks[index].isCompleted = subtasks[index].isCompleted == 1 ? 0 : 1;
     subtasks.removeAt(index);
-    notifyListeners();
   }
 
-  Future<void> deleteSubtask(int index) async{
+  Future<void> deleteSubtask(int index) async {
     await _dbService.deleteSubtask(subtasks[index].id!);
   }
 
   Future<void> saveChanges() async {
     final int taskId = task['id'];
-    
-    // Save main task details
+
     final Map<String, dynamic> updatedRow = {
       'notes': notesController.text,
-      'due_date': selectedDueDate?.millisecondsSinceEpoch,
+      'due_date': selectedDueDate.value?.millisecondsSinceEpoch,
     };
     await _dbService.updateTask(taskId, updatedRow);
 
-    // Save subtasks: This is a simplified approach (delete all and re-insert for the task)
-    // In a real production app, you'd likely track dirty states or use a more efficient sync.
-    // For this example, we'll follow the requirement to call updateSubtask logic.
-    
-    // First, clear existing subtasks for this task in DB to sync properly
-    // Note: DatabaseService doesn't have a 'deleteAllSubtasksForTask' method, 
-    // so we'd ideally implement one. For now, we'll just save new/updated ones if they have content.
-    
     for (int i = 0; i < subtasks.length; i++) {
       final subtask = subtasks[i];
       subtask.title = subtask.controller?.text ?? subtask.title;
-      
+
       if (subtask.title.isNotEmpty) {
         if (subtask.id == null) {
           await _dbService.createSubtask(subtask.toMap(taskId, i));
@@ -90,10 +81,12 @@ class TaskDetailsController extends ChangeNotifier {
     }
   }
 
-  void disposeControllers() {
+  @override
+  void onClose() {
     notesController.dispose();
     for (var subtask in subtasks) {
       subtask.controller?.dispose();
     }
+    super.onClose();
   }
 }

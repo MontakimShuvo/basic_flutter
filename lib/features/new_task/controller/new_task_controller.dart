@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:untitled/di/injector.dart';
 import '../../../data/services/database_service.dart';
 import '../../../data/model/subtask.dart';
 
-class NewTaskController extends ChangeNotifier {
+class NewTaskController extends GetxController {
   final int? id;
   final String taskName;
   final bool isFavouriteTab;
-  final List<Map<String, dynamic>> items = [];
+  final items = <Map<String, dynamic>>[].obs;
   final DatabaseService _dbService = resolve<DatabaseService>();
   final VoidCallback? onDeleteList;
 
@@ -19,7 +20,11 @@ class NewTaskController extends ChangeNotifier {
     required this.taskName,
     this.isFavouriteTab = false,
     this.onDeleteList,
-  }) {
+  });
+
+  @override
+  void onInit() {
+    super.onInit();
     loadTasks();
   }
 
@@ -29,12 +34,10 @@ class NewTaskController extends ChangeNotifier {
 
   Future<void> deleteSubtask(int subtaskId) async {
     await _dbService.deleteSubtask(subtaskId);
-    notifyListeners();
   }
 
   Future<void> toggleSubtask(int subtaskId, int isCompleted) async {
     await _dbService.updateSubtask(subtaskId, {'is_completed': isCompleted == 1 ? 0 : 1});
-    notifyListeners();
   }
 
   Future<void> toggleTask(int taskId, int isCompleted) async {
@@ -60,7 +63,6 @@ class NewTaskController extends ChangeNotifier {
     items.clear();
     items.addAll(tasks);
     _applySort();
-    notifyListeners();
   }
 
   Future<void> deleteList() async {
@@ -73,7 +75,6 @@ class NewTaskController extends ChangeNotifier {
   void sortTasks(String sortType) {
     currentSort = sortType;
     _applySort();
-    notifyListeners();
   }
 
   void _applySort() {
@@ -117,6 +118,5 @@ class NewTaskController extends ChangeNotifier {
 
     items.add({...newTask, 'id': taskId});
     _applySort();
-    notifyListeners();
   }
 }

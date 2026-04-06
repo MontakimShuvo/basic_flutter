@@ -1,29 +1,35 @@
 import 'package:flutter/material.dart';
-
 import '../../../../constants/app_constants.dart';
 import '../../../../constants/app_edge_insets.dart';
 import '../../../../utils/size_config.dart';
 import '../../../../widgets/calendar_widget/task_calendar_sheet.dart';
 import '../../../../widgets/text_field/common_input_field.dart';
-import '../../controller/home_controller.dart';
 
 class TaskInfo extends StatefulWidget {
-  final HomeController homeController;
   final void Function(String title, String details, DateTime? date)? onDone;
 
-  const TaskInfo({super.key, required this.homeController, this.onDone});
+  const TaskInfo({
+    super.key,
+    this.onDone,
+  });
 
   @override
   State<TaskInfo> createState() => _TaskInfoState();
 }
 
 class _TaskInfoState extends State<TaskInfo> {
+  final TextEditingController _titleController = TextEditingController();
+  final TextEditingController _detailsController = TextEditingController();
+
   final FocusNode _detailsFocusNode = FocusNode();
+
   bool _showDetails = false;
   DateTime? _selectedDate;
 
   @override
   void dispose() {
+    _titleController.dispose();
+    _detailsController.dispose();
     _detailsFocusNode.dispose();
     super.dispose();
   }
@@ -31,20 +37,24 @@ class _TaskInfoState extends State<TaskInfo> {
   @override
   Widget build(BuildContext context) {
     SizeConfig().init(context);
+
     return Container(
       padding: AppEdgeInsets.defaultPagePadding,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
+          /// TITLE
           CommonInputField(
-            controller: widget.homeController.taskTitleController,
+            controller: _titleController,
             height: AppConstants.valueDouble40,
             hintText: 'New Task',
             autofocus: true,
           ),
+
+          /// DETAILS
           if (_showDetails)
             CommonInputField(
-              controller: widget.homeController.taskDetailsController,
+              controller: _detailsController,
               focusNode: _detailsFocusNode,
               height: AppConstants.valueDouble30,
               hintText: 'Add Details',
@@ -53,16 +63,17 @@ class _TaskInfoState extends State<TaskInfo> {
                 color: Colors.black54,
               ),
             ),
+
+          /// ACTION ROW
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Row(
                 children: [
+                  /// SHOW DETAILS
                   GestureDetector(
                     onTap: () {
-                      setState(() {
-                        _showDetails = true;
-                      });
+                      setState(() => _showDetails = true);
                       _detailsFocusNode.requestFocus();
                     },
                     child: Image.asset(
@@ -71,11 +82,12 @@ class _TaskInfoState extends State<TaskInfo> {
                       height: AppConstants.valueDouble24,
                     ),
                   ),
-                  SizedBox(width: 20),
+
+                  const SizedBox(width: 20),
+
+                  /// PICK DATE
                   GestureDetector(
-                    onTap: () {
-                      openTaskCalendar(context);
-                    },
+                    onTap: () => _openTaskCalendar(context),
                     child: Image.asset(
                       'assets/icons/ic_clock.png',
                       width: AppConstants.valueDouble24,
@@ -85,17 +97,10 @@ class _TaskInfoState extends State<TaskInfo> {
                 ],
               ),
 
+              /// DONE BUTTON
               TextButton(
-                  onPressed: () {
-                    if (widget.onDone != null) {
-                      widget.onDone!(
-                        widget.homeController.taskTitleController.text,
-                        widget.homeController.taskDetailsController.text,
-                        _selectedDate,
-                      );
-                    }
-                  },
-                  child: Text('Done')
+                onPressed: _onDone,
+                child: const Text('Done'),
               ),
             ],
           ),
@@ -104,18 +109,30 @@ class _TaskInfoState extends State<TaskInfo> {
     );
   }
 
-  void openTaskCalendar(BuildContext context) async {
+  /// ---------------- ACTIONS ----------------
+
+  void _onDone() {
+    final title = _titleController.text.trim();
+
+    if (title.isEmpty) return;
+
+    widget.onDone?.call(
+      title,
+      _detailsController.text.trim(),
+      _selectedDate,
+    );
+  }
+
+  void _openTaskCalendar(BuildContext context) async {
     final result = await showModalBottomSheet<DateTime>(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (_) => const TaskCalendarSheet(),
     );
-    
+
     if (result != null) {
-      setState(() {
-        _selectedDate = result;
-      });
+      setState(() => _selectedDate = result);
     }
   }
 }
