@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:untitled/di/injector.dart';
 import 'package:untitled/features/new_tab_screen/create_task_list_tab_screen.dart';
 import '../../../data/services/database_service.dart';
@@ -6,8 +7,8 @@ import '../../new_task/view/task_list_screen.dart';
 import '../../../widgets/tab_item.dart';
 import '../../new_task/controller/new_task_controller.dart';
 
-class HomeController extends ChangeNotifier {
-  final List<NewTaskController> taskControllers = [];
+class HomeController extends GetxController {
+  final taskControllers = <NewTaskController>[].obs;
   final DatabaseService _dbService = resolve<DatabaseService>();
 
   var taskTitleController = TextEditingController();
@@ -31,7 +32,6 @@ class HomeController extends ChangeNotifier {
           onDeleteList: ()=>_loadTaskLists()
         ));
       }
-      notifyListeners();
     }
   }
 
@@ -48,8 +48,6 @@ class HomeController extends ChangeNotifier {
       id: id,
       taskName: taskName,
     ));
-
-    notifyListeners();
   }
 
   Future<void> updateTaskList(int id, String newName) async {

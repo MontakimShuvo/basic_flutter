@@ -1,18 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:untitled/di/injector.dart';
 import '../../../data/services/database_service.dart';
 import '../../../data/model/subtask.dart';
 
-class NewTaskController extends ChangeNotifier {
+class NewTaskController extends GetxController {
   final int? id;
   final String taskName;
   final bool isFavouriteTab;
-  final List<Map<String, dynamic>> items = [];
+  final items = <Map<String, dynamic>>[].obs;
   final DatabaseService _dbService = resolve<DatabaseService>();
   final VoidCallback? onDeleteList;
 
-  List<Subtask> subtasks = [];
-  String currentSort = "my_order";
+  final subtasks = <Subtask>[].obs;
+  final currentSort = "my_order".obs;
 
   NewTaskController({
     this.id,
@@ -29,12 +30,12 @@ class NewTaskController extends ChangeNotifier {
 
   Future<void> deleteSubtask(int subtaskId) async {
     await _dbService.deleteSubtask(subtaskId);
-    notifyListeners();
+    // Reactive lists update automatically when modified if using obs methods, 
+    // but here we likely need to reload or update the list manually.
   }
 
   Future<void> toggleSubtask(int subtaskId, int isCompleted) async {
     await _dbService.updateSubtask(subtaskId, {'is_completed': isCompleted == 1 ? 0 : 1});
-    notifyListeners();
   }
 
   Future<void> toggleTask(int taskId, int isCompleted) async {
@@ -57,10 +58,8 @@ class NewTaskController extends ChangeNotifier {
       return;
     }
 
-    items.clear();
-    items.addAll(tasks);
+    items.assignAll(tasks);
     _applySort();
-    notifyListeners();
   }
 
   Future<void> deleteList() async {
@@ -71,13 +70,12 @@ class NewTaskController extends ChangeNotifier {
   }
 
   void sortTasks(String sortType) {
-    currentSort = sortType;
+    currentSort.value = sortType;
     _applySort();
-    notifyListeners();
   }
 
   void _applySort() {
-    switch (currentSort) {
+    switch (currentSort.value) {
       case "date":
         items.sort((a, b) => (a['created_at'] ?? 0).compareTo(b['created_at'] ?? 0));
         break;
@@ -117,6 +115,5 @@ class NewTaskController extends ChangeNotifier {
 
     items.add({...newTask, 'id': taskId});
     _applySort();
-    notifyListeners();
   }
 }
