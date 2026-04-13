@@ -9,8 +9,10 @@ void main() {
   WidgetsFlutterBinding.ensureInitialized();
   setupInjector();
   runApp(
-    ChangeNotifierProvider(
-      create: (context) => HomeController(),
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => HomeController()),
+      ],
       child: const MyApp(),
     ),
   );
