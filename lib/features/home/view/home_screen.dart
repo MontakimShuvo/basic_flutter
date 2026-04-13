@@ -1,10 +1,10 @@
 // lib/features/home/view/home_screen.dart
 
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../../widgets/bottom_sheet/common_bottom_sheet.dart';
 import '../controller/home_controller.dart';
 import '../../../widgets/common_app_bar.dart';
-import '../../new_tab_screen/create_task_list_tab_screen.dart';
 import 'widget/task_info.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -22,19 +22,20 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
-  final HomeController _homeController = HomeController();
   TabController? _tabController;
 
   @override
   void initState() {
     super.initState();
-    // Initialize controller after the home controller loads initial lists
-    _setupTabController();
-    _homeController.addListener(_setupTabController);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _setupTabController();
+      context.read<HomeController>().addListener(_setupTabController);
+    });
   }
 
   void _setupTabController() {
-    final newLength = _homeController.tabsTitle.length;
+    final homeController = context.read<HomeController>();
+    final newLength = homeController.tabsTitle.length;
     if (_tabController == null || _tabController!.length != newLength) {
       _tabController?.removeListener(_handleTabSelection);
       _tabController?.dispose();
@@ -45,23 +46,22 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         initialIndex: (newLength - 2).clamp(0, newLength - 1),
       );
       _tabController!.addListener(_handleTabSelection);
+      setState(() {});
     }
   }
 
   void _handleTabSelection() {
     if (_tabController != null && !_tabController!.indexIsChanging) {
-      // Find the index of the Favorites tab
-      final favIndex = _homeController.taskControllers
+      final homeController = context.read<HomeController>();
+      final favIndex = homeController.taskControllers
           .indexWhere((c) => c.isFavouriteTab);
       final currentIndex = _tabController!.index;
 
-
-      // If the selected tab is the Favorites tab or other, refresh its data
-      if (_tabController!.index == favIndex && favIndex != -1) {
-        _homeController.taskControllers[favIndex].loadTasks();
-      }else{
-        if (currentIndex < _homeController.taskControllers.length) {
-          _homeController.taskControllers[currentIndex].loadTasks();
+      if (currentIndex == favIndex && favIndex != -1) {
+        homeController.taskControllers[favIndex].loadTasks();
+      } else {
+        if (currentIndex < homeController.taskControllers.length) {
+          homeController.taskControllers[currentIndex].loadTasks();
         }
       }
     }
@@ -69,47 +69,44 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
   @override
   void dispose() {
-    _homeController.removeListener(_setupTabController);
+    // Note: We need to be careful about accessing context here.
+    // Usually, you'd remove the listener in a way that doesn't depend on context if possible,
+    // or ensure the controller is still alive.
     _tabController?.removeListener(_handleTabSelection);
     _tabController?.dispose();
     super.dispose();
   }
 
-  // Update in lib/features/home/view/home_screen.dart
-
-
-
   @override
   Widget build(BuildContext context) {
-    return ListenableBuilder(
-      listenable: _homeController,
-      builder: (context, child) {
+    return Consumer<HomeController>(
+      builder: (context, homeController, child) {
         if (_tabController == null) return const Scaffold();
 
         return Scaffold(
           appBar: CommonAppBar(
             title: widget.title,
             trailingIcon: widget.trailingIcon,
-            tabsTitle: _homeController.tabsTitle,
-            tabController: _tabController, // Pass the controller to your AppBar
-            addNewTask: (ctx) => _homeController.gotoCreateTaskScreen(ctx),
+            tabsTitle: homeController.tabsTitle,
+            tabController: _tabController,
+            addNewTask: (ctx) => homeController.gotoCreateTaskScreen(ctx),
           ),
           backgroundColor: Colors.white,
           body: TabBarView(
             controller: _tabController,
-            children: _homeController.getTabBarView(context),
+            children: homeController.getTabBarView(context),
           ),
           floatingActionButton: FloatingActionButton(
             onPressed: () {
               CommonBottomSheet.show(
                 context: context,
                 body: TaskInfo(
-                  homeController: _homeController,
+                  homeController: homeController,
                   onDone: (title, details, date) {
                     if (title.isNotEmpty) {
                       final index = _tabController!.index;
-                      if (index < _homeController.taskControllers.length) {
-                        _homeController.taskControllers[index].addItem(
+                      if (index < homeController.taskControllers.length) {
+                        homeController.taskControllers[index].addItem(
                           taskTitle: title,
                           notes: details,
                           dueDate: date,
