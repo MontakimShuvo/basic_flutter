@@ -76,7 +76,6 @@ class TaskItemWidget extends StatelessWidget {
                       ),
                       // wrap this widget expanded widget
                       const SizedBox(width: AppConstants.valueDouble12),
-                      // wrap ``GestureDetector`` widget expanded widget
                       Expanded(
                         child: GestureDetector(
                           onTap: () async {
