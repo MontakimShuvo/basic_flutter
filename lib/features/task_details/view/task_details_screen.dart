@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 import 'package:untitled/constants/app_constants.dart';
 import '../../../widgets/calendar_widget/task_calendar_sheet.dart';
 import '../../../widgets/text_field/common_input_field.dart';
@@ -56,190 +57,194 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
           ).format(DateTime.fromMillisecondsSinceEpoch(createAtMillis))
         : '';
 
-    return ListenableBuilder(
-      listenable: _controller,
-      builder: (context, child) {
-        final String dueDateDisplay = _controller.selectedDueDate != null
-            ? DateFormat(
-                'EEE, MMM d, h:mm a',
-              ).format(_controller.selectedDueDate!)
-            : 'Set due date';
-
-        return PopScope(
-          canPop: false,
-          onPopInvokedWithResult: (didPop, result) async {
-            if (didPop) return;
-            await _controller.saveChanges();
-            if (context.mounted) {
-              Navigator.pop(context);
-            }
-          },
-          child: Scaffold(
-            floatingActionButton: Container(
-              width: 190,
-              height: 50,
-              decoration: BoxDecoration(
-                color: const Color(0xff5c6bc0),
-                borderRadius: BorderRadius.circular(30),
-              ),
-              child: const Center(
-                child: Text(
-                  "Mark completed",
-                  style: TextStyle(color: Colors.white, fontSize: 16),
-                ),
-              ),
+    return ChangeNotifierProvider.value(
+      value: _controller,
+      child: PopScope(
+        canPop: false,
+        onPopInvokedWithResult: (didPop, result) async {
+          if (didPop) return;
+          await _controller.saveChanges();
+          if (context.mounted) {
+            Navigator.pop(context);
+          }
+        },
+        child: Scaffold(
+          floatingActionButton: Container(
+            width: 190,
+            height: 50,
+            decoration: BoxDecoration(
+              color: const Color(0xff5c6bc0),
+              borderRadius: BorderRadius.circular(30),
             ),
-            body: SafeArea(
-              child: Container(
-                height: SizeConfig.screenHeight * AppConstants.percent80,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(
-                    AppConstants.valueDouble24,
-                  ),
-                ),
-                child: Column(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: AppConstants.valueDouble12,
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          IconButton(
-                            icon: const Icon(Icons.arrow_back),
-                            onPressed: () => Navigator.maybePop(context),
-                          ),
-                          Row(
-                            children: const [
-                              Icon(Icons.star_border),
-                              SizedBox(width: AppConstants.valueDouble16),
-                              Icon(Icons.more_vert),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: AppConstants.valueDouble20),
-                    Expanded(
-                      child: SingleChildScrollView(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: AppConstants.valueDouble12,
-                        ),
-                        child: Container(
-                          padding: const EdgeInsets.all(
-                            AppConstants.valueDouble20,
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                children: const [
-                                  Text(
-                                    "My Tasks",
-                                    style: TextStyle(
-                                      fontSize: AppConstants.valueDouble18,
-                                      fontWeight: FontWeight.w500,
-                                      color: Color(0xff5c6bc0),
-                                    ),
-                                  ),
-                                  SizedBox(width: AppConstants.valueDouble6),
-                                  Icon(Icons.arrow_drop_down),
-                                ],
-                              ),
-                              const SizedBox(height: AppConstants.valueDouble25),
-                              Text(
-                                title,
-                                style: const TextStyle(
-                                  fontSize: AppConstants.valueDouble28,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                              const SizedBox(height: AppConstants.valueDouble20),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  const Icon(Icons.notes_outlined),
-                                  const SizedBox(
-                                    width: AppConstants.valueDouble12,
-                                  ),
-                                  Expanded(
-                                    child: CommonInputField(
-                                      controller: _controller.notesController,
-                                      hintText: "Add description",
-                                      style: const TextStyle(fontSize: 16),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: AppConstants.valueDouble20),
-                              GestureDetector(
-                                onTap: () => _openTaskCalendar(context),
-                                child: Row(
-                                  children: [
-                                    const Icon(Icons.adjust),
-                                    const SizedBox(
-                                      width: AppConstants.valueDouble12,
-                                    ),
-                                    chip("Due $dueDateDisplay"),
-                                  ],
-                                ),
-                              ),
-                              const SizedBox(height: AppConstants.valueDouble12),
-                              Row(
-                                children: [
-                                  const Icon(Icons.access_time),
-                                  const SizedBox(
-                                    width: AppConstants.valueDouble12,
-                                  ),
-                                  chip(createAtDate),
-                                ],
-                              ),
-                              const SizedBox(height: AppConstants.valueDouble25),
-
-                              ...List.generate(_controller.subtasks.length, (index) {
-                                return SubtaskTile(
-                                  isShownArrow: true,
-                                  subtask: _controller.subtasks[index],
-                                  onRemove: () =>
-                                  {
-                                    _controller.deleteSubtask(index),
-                                    _controller.removeSubtask(index)
-                                  }
-                                );
-                              }),
-
-                              Row(
-                                children: [
-                                  Icon(Icons.subdirectory_arrow_right),
-                                  SizedBox(width: AppConstants.valueDouble12),
-                                  GestureDetector(
-                                    onTap: () {
-                                      _controller.addSubtask();
-                                    },
-                                    child: const Text(
-                                      "Add subtasks",
-                                      style: TextStyle(
-                                        fontSize: AppConstants.valueDouble16,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
+            child: const Center(
+              child: Text(
+                "Mark completed",
+                style: TextStyle(color: Colors.white, fontSize: 16),
               ),
             ),
           ),
-        );
-      },
+          body: SafeArea(
+            child: Container(
+              height: SizeConfig.screenHeight * AppConstants.percent80,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(
+                  AppConstants.valueDouble24,
+                ),
+              ),
+              child: Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppConstants.valueDouble12,
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        IconButton(
+                          icon: const Icon(Icons.arrow_back),
+                          onPressed: () => Navigator.maybePop(context),
+                        ),
+                        Row(
+                          children: const [
+                            Icon(Icons.star_border),
+                            SizedBox(width: AppConstants.valueDouble16),
+                            Icon(Icons.more_vert),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: AppConstants.valueDouble20),
+                  Expanded(
+                    child: SingleChildScrollView(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: AppConstants.valueDouble12,
+                      ),
+                      child: Container(
+                        padding: const EdgeInsets.all(
+                          AppConstants.valueDouble20,
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: const [
+                                Text(
+                                  "My Tasks",
+                                  style: TextStyle(
+                                    fontSize: AppConstants.valueDouble18,
+                                    fontWeight: FontWeight.w500,
+                                    color: Color(0xff5c6bc0),
+                                  ),
+                                ),
+                                SizedBox(width: AppConstants.valueDouble6),
+                                Icon(Icons.arrow_drop_down),
+                              ],
+                            ),
+                            const SizedBox(height: AppConstants.valueDouble25),
+                            Text(
+                              title,
+                              style: const TextStyle(
+                                fontSize: AppConstants.valueDouble28,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            const SizedBox(height: AppConstants.valueDouble20),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                const Icon(Icons.notes_outlined),
+                                const SizedBox(
+                                  width: AppConstants.valueDouble12,
+                                ),
+                                Expanded(
+                                  child: CommonInputField(
+                                    controller: _controller.notesController,
+                                    hintText: "Add description",
+                                    style: const TextStyle(fontSize: 16),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: AppConstants.valueDouble20),
+                            GestureDetector(
+                              onTap: () => _openTaskCalendar(context),
+                              child: Row(
+                                children: [
+                                  const Icon(Icons.adjust),
+                                  const SizedBox(
+                                    width: AppConstants.valueDouble12,
+                                  ),
+                                  Selector<TaskDetailsController, DateTime?>(
+                                    selector: (_, controller) => controller.selectedDueDate,
+                                    builder: (context, dueDate, child) {
+                                      final String dueDateDisplay = dueDate != null
+                                          ? DateFormat('EEE, MMM d, h:mm a').format(dueDate)
+                                          : 'Set due date';
+                                      return chip("Due $dueDateDisplay");
+                                    },
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(height: AppConstants.valueDouble12),
+                            Row(
+                              children: [
+                                const Icon(Icons.access_time),
+                                const SizedBox(
+                                  width: AppConstants.valueDouble12,
+                                ),
+                                chip(createAtDate),
+                              ],
+                            ),
+                            const SizedBox(height: AppConstants.valueDouble25),
+                            Selector<TaskDetailsController, int>(
+                              selector: (_, controller) => controller.subtasks.length,
+                              builder: (context, length, child) {
+                                return Column(
+                                  children: List.generate(length, (index) {
+                                    return SubtaskTile(
+                                      isShownArrow: true,
+                                      subtask: context.read<TaskDetailsController>().subtasks[index],
+                                      onRemove: () {
+                                        _controller.deleteSubtask(index);
+                                        _controller.removeSubtask(index);
+                                      },
+                                    );
+                                  }),
+                                );
+                              },
+                            ),
+                            Row(
+                              children: [
+                                const Icon(Icons.subdirectory_arrow_right),
+                                const SizedBox(width: AppConstants.valueDouble12),
+                                GestureDetector(
+                                  onTap: () {
+                                    _controller.addSubtask();
+                                  },
+                                  child: const Text(
+                                    "Add subtasks",
+                                    style: TextStyle(
+                                      fontSize: AppConstants.valueDouble16,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
     );
   }
 
