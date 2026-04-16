@@ -1,7 +1,8 @@
-// lib/features/home/view/home_screen.dart
+
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:untitled/widgets/tab_item.dart';
 import '../../../widgets/bottom_sheet/common_bottom_sheet.dart';
 import '../controller/home_controller.dart';
 import '../../../widgets/common_app_bar.dart';
@@ -69,9 +70,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
   @override
   void dispose() {
-    // Note: We need to be careful about accessing context here.
-    // Usually, you'd remove the listener in a way that doesn't depend on context if possible,
-    // or ensure the controller is still alive.
     _tabController?.removeListener(_handleTabSelection);
     _tabController?.dispose();
     super.dispose();
@@ -79,50 +77,53 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<HomeController>(
-      builder: (context, homeController, child) {
+    return Selector<HomeController, int>(
+      selector: (_, controller) => controller.taskControllers.length,
+      builder: (context, taskCount, child) {
         if (_tabController == null) return const Scaffold();
 
         return Scaffold(
           appBar: CommonAppBar(
             title: widget.title,
             trailingIcon: widget.trailingIcon,
-            tabsTitle: homeController.tabsTitle,
+            tabsTitle: context.select<HomeController, List<TabItem>>((c) => c.tabsTitle),
             tabController: _tabController,
-            addNewTask: (ctx) => homeController.gotoCreateTaskScreen(ctx),
+            addNewTask: (ctx) => context.read<HomeController>().gotoCreateTaskScreen(ctx),
           ),
           backgroundColor: Colors.white,
           body: TabBarView(
             controller: _tabController,
-            children: homeController.getTabBarView(context),
+            children: context.read<HomeController>().getTabBarView(context),
           ),
-          floatingActionButton: FloatingActionButton(
-            onPressed: () {
-              CommonBottomSheet.show(
-                context: context,
-                body: TaskInfo(
-                  homeController: homeController,
-                  onDone: (title, details, date) {
-                    if (title.isNotEmpty) {
-                      final index = _tabController!.index;
-                      if (index < homeController.taskControllers.length) {
-                        homeController.taskControllers[index].addItem(
-                          taskTitle: title,
-                          notes: details,
-                          dueDate: date,
-                        );
-                        Navigator.pop(context);
-                      }
-                    }
-                  },
-                ),
-              );
-            },
-            backgroundColor: Colors.blue,
-            child: const Icon(Icons.add, color: Colors.white),
-          ),
+          floatingActionButton: child,
         );
       },
+      child: FloatingActionButton(
+        backgroundColor: Colors.blue,
+        child: const Icon(Icons.add, color: Colors.white),
+        onPressed: () {
+          final homeController = context.read<HomeController>();
+          CommonBottomSheet.show(
+            context: context,
+            body: TaskInfo(
+              homeController: homeController,
+              onDone: (title, details, date) {
+                if (title.isNotEmpty) {
+                  final index = _tabController!.index;
+                  if (index < homeController.taskControllers.length) {
+                    homeController.taskControllers[index].addItem(
+                      taskTitle: title,
+                      notes: details,
+                      dueDate: date,
+                    );
+                    Navigator.pop(context);
+                  }
+                }
+              },
+            ),
+          );
+        },
+      ),
     );
   }
 }
