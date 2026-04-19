@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:untitled/di/injector.dart';
 import 'package:untitled/features/home/controller/home_controller.dart';
 import 'package:untitled/features/home/view/home_screen.dart';
+import 'package:untitled/features/new_task/controller/new_task_controller.dart';
 import 'package:untitled/utils/size_config.dart';
 
 void main() {

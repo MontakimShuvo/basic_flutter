@@ -14,6 +14,8 @@ class NewTaskController extends ChangeNotifier {
   List<Subtask> subtasks = [];
   String currentSort = "my_order";
 
+  bool isCompletedExpanded = false;
+
   NewTaskController({
     this.id,
     required this.taskName,
@@ -21,6 +23,11 @@ class NewTaskController extends ChangeNotifier {
     this.onDeleteList,
   }) {
     loadTasks();
+  }
+
+  void toggleCompletedExpanded() {
+    isCompletedExpanded = !isCompletedExpanded;
+    notifyListeners();
   }
 
   Future<List<Map<String, dynamic>>> loadSubtasks(int taskId) async {

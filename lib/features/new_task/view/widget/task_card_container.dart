@@ -6,7 +6,7 @@ import 'package:untitled/features/new_task/view/widget/no_task_found_widget.dart
 import '../../../../widgets/bottom_sheet/common_bottom_sheet.dart';
 import '../../../home/view/widget/sort_bottom_sheet.dart';
 
-class TaskCardContainer extends StatefulWidget {
+class TaskCardContainer extends StatelessWidget {
   final NewTaskController controller;
   final VoidCallback onRenameTap;
 
@@ -15,13 +15,6 @@ class TaskCardContainer extends StatefulWidget {
     required this.controller,
     required this.onRenameTap,
   });
-
-  @override
-  State<TaskCardContainer> createState() => _TaskCardContainerState();
-}
-
-class _TaskCardContainerState extends State<TaskCardContainer> {
-  bool isCompletedExpanded = false;
 
   @override
   Widget build(BuildContext context) {
@@ -34,7 +27,6 @@ class _TaskCardContainerState extends State<TaskCardContainer> {
             selector: (_, controller) => controller.items.toList(),
             builder: (context, tasks, child) {
               final pendingTasks = tasks.where((t) => t['is_completed'] == 0).toList();
-
               if (pendingTasks.isEmpty) return const NoTaskFoundWidget();
 
               return Selector<NewTaskController, String>(
@@ -42,9 +34,9 @@ class _TaskCardContainerState extends State<TaskCardContainer> {
                 builder: (context, taskName, child) {
                   return TaskItemWidget(
                     title: taskName,
-                    controller: widget.controller,
+                    controller: controller,
                     tasks: pendingTasks,
-                    onRenameTap: widget.onRenameTap,
+                    onRenameTap: onRenameTap,
                     onHeaderAction: () => _showSortSheet(context),
                   );
                 },
@@ -58,12 +50,17 @@ class _TaskCardContainerState extends State<TaskCardContainer> {
               final completeTasks = tasks.where((t) => t['is_completed'] == 1).toList();
               if (completeTasks.isEmpty) return const SizedBox.shrink();
 
-              return TaskItemWidget(
-                title: "Completed (${completeTasks.length})",
-                controller: widget.controller,
-                tasks: completeTasks,
-                isExpanded: isCompletedExpanded,
-                onHeaderAction: () => setState(() => isCompletedExpanded = !isCompletedExpanded),
+              return Selector<NewTaskController, bool>(
+                selector: (_, controller) => controller.isCompletedExpanded,
+                builder: (context, isExpanded, child) {
+                  return TaskItemWidget(
+                    title: "Completed (${completeTasks.length})",
+                    controller: controller,
+                    tasks: completeTasks,
+                    isExpanded: isExpanded,
+                    onHeaderAction: () => controller.toggleCompletedExpanded(),
+                  );
+                },
               );
             },
           ),
@@ -76,9 +73,9 @@ class _TaskCardContainerState extends State<TaskCardContainer> {
     CommonBottomSheet.show(
       context: context,
       body: SortBottomSheet(
-        selectedSort: widget.controller.currentSort,
+        selectedSort: controller.currentSort,
         onSortSelected: (value) {
-          widget.controller.sortTasks(value);
+          controller.sortTasks(value);
         },
       ),
     );
