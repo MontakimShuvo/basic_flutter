@@ -78,16 +78,7 @@ class TaskItemWidget extends StatelessWidget {
                       const SizedBox(width: AppConstants.valueDouble12),
                       Expanded(
                         child: GestureDetector(
-                          onTap: () async {
-                            await Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    TaskDetailsScreen(task: task),
-                              ),
-                            );
-                            controller.loadTasks();
-                          },
+                          onTap: () => controller.gotoTaskDetails(context, task),
                           child: Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
