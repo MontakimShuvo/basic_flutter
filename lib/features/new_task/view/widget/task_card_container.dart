@@ -34,7 +34,7 @@ class TaskCardContainer extends StatelessWidget {
                 builder: (context, taskName, child) {
                   return TaskItemWidget(
                     title: taskName,
-                    controller: controller,
+                    // controller: controller,
                     tasks: pendingTasks,
                     onRenameTap: onRenameTap,
                     onHeaderAction: () => _showSortSheet(context),
@@ -55,7 +55,7 @@ class TaskCardContainer extends StatelessWidget {
                 builder: (context, isExpanded, child) {
                   return TaskItemWidget(
                     title: "Completed (${completeTasks.length})",
-                    controller: controller,
+                    // controller: controller,
                     tasks: completeTasks,
                     isExpanded: isExpanded,
                     onHeaderAction: () => controller.toggleCompletedExpanded(),
