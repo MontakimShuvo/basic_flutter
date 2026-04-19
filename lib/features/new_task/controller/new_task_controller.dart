@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:untitled/di/injector.dart';
+import 'package:untitled/utils/app_router.dart';
 import '../../../data/services/database_service.dart';
 import '../../../data/model/subtask.dart';
 
@@ -14,6 +16,8 @@ class NewTaskController extends ChangeNotifier {
   List<Subtask> subtasks = [];
   String currentSort = "my_order";
 
+  bool isCompletedExpanded = false;
+
   NewTaskController({
     this.id,
     required this.taskName,
@@ -21,6 +25,11 @@ class NewTaskController extends ChangeNotifier {
     this.onDeleteList,
   }) {
     loadTasks();
+  }
+
+  void toggleCompletedExpanded() {
+    isCompletedExpanded = !isCompletedExpanded;
+    notifyListeners();
   }
 
   Future<List<Map<String, dynamic>>> loadSubtasks(int taskId) async {
@@ -118,5 +127,10 @@ class NewTaskController extends ChangeNotifier {
     items.add({...newTask, 'id': taskId});
     _applySort();
     notifyListeners();
+  }
+
+  void gotoTaskDetails(BuildContext context, Map<String, dynamic> task) async {
+    await context.push(AppRouter.taskDetails, extra: task);
+    loadTasks();
   }
 }

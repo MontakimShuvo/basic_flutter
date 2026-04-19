@@ -1,98 +1,82 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart' show Selector;
 import 'package:untitled/features/new_task/controller/new_task_controller.dart';
 import 'package:untitled/features/new_task/view/widget/task_item_widget.dart';
-import '../../../../constants/app_colors_as.dart';
+import 'package:untitled/features/new_task/view/widget/no_task_found_widget.dart';
 import '../../../../widgets/bottom_sheet/common_bottom_sheet.dart';
 import '../../../home/view/widget/sort_bottom_sheet.dart';
 
-class TaskCardContainer extends StatefulWidget {
-  final String title;
-  final List<Map<String, dynamic>> tasks;
+class TaskCardContainer extends StatelessWidget {
   final NewTaskController controller;
   final VoidCallback onRenameTap;
 
   const TaskCardContainer({
     super.key,
-    required this.title,
-    required this.tasks,
     required this.controller,
     required this.onRenameTap,
   });
 
   @override
-  State<TaskCardContainer> createState() => _TaskCardContainerState();
-}
-
-class _TaskCardContainerState extends State<TaskCardContainer> {
-  bool isCompletedExpanded = false;
-
-  @override
   Widget build(BuildContext context) {
-    final pendingTasks = widget.tasks
-        .where((task) => task['is_completed'] == 0)
-        .toList();
-    final completeTasks = widget.tasks
-        .where((task) => task['is_completed'] == 1)
-        .toList();
-
     return SingleChildScrollView(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         mainAxisSize: MainAxisSize.min,
         children: [
-          if (pendingTasks.isEmpty)
-            Container(
-              margin: const EdgeInsets.all(16),
-              height: 200,
-              width: double.infinity,
-              decoration: BoxDecoration(
-                color: AppColors.noCardFoundBackgroundColor,
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Center(
-                child: Image.asset(
-                  'assets/icons/no_task_found.png',
-                  width: double.infinity,
-                ),
-              ),
-            ),
+          Selector<NewTaskController, List<Map<String, dynamic>>>(
+            selector: (_, controller) => controller.items.toList(),
+            builder: (context, tasks, child) {
+              final pendingTasks = tasks.where((t) => t['is_completed'] == 0).toList();
+              if (pendingTasks.isEmpty) return const NoTaskFoundWidget();
 
-          if (pendingTasks.isNotEmpty)
-            TaskItemWidget(
-              title: widget.title,
-              controller: widget.controller,
-              tasks: pendingTasks,
-              onHeaderAction: () {
-                CommonBottomSheet.show(
-                  context: context,
-                  body: SortBottomSheet(
-                    selectedSort: widget.controller.currentSort,
-                    onSortSelected: (value) {
-                      widget.controller.sortTasks(value);
-                    },
-                  ),
-                );
-              },
-                onRenameTap: widget.onRenameTap,
-            ),
+              return Selector<NewTaskController, String>(
+                selector: (_, controller) => controller.taskName,
+                builder: (context, taskName, child) {
+                  return TaskItemWidget(
+                    title: taskName,
+                    // controller: controller,
+                    tasks: pendingTasks,
+                    onRenameTap: onRenameTap,
+                    onHeaderAction: () => _showSortSheet(context),
+                  );
+                },
+              );
+            },
+          ),
 
-          if (completeTasks.isNotEmpty)
-            TaskItemWidget(
-              title: "Completed (${completeTasks.length})",
-              controller: widget.controller,
-              tasks: completeTasks,
-              headerAssetIcon: isCompletedExpanded 
-                  ? "assets/icons/ic_collapse.png" 
-                  : "assets/icons/ic_expand.png",
-              isExpanded: isCompletedExpanded,
-              onRenameTap: widget.onRenameTap,
-              onHeaderAction: () {
-                setState(() {
-                  isCompletedExpanded = !isCompletedExpanded;
-                });
-              },
-            ),
+          Selector<NewTaskController, List<Map<String, dynamic>>>(
+            selector: (_, controller) => controller.items.toList(),
+            builder: (context, tasks, child) {
+              final completeTasks = tasks.where((t) => t['is_completed'] == 1).toList();
+              if (completeTasks.isEmpty) return const SizedBox.shrink();
+
+              return Selector<NewTaskController, bool>(
+                selector: (_, controller) => controller.isCompletedExpanded,
+                builder: (context, isExpanded, child) {
+                  return TaskItemWidget(
+                    title: "Completed (${completeTasks.length})",
+                    // controller: controller,
+                    tasks: completeTasks,
+                    isExpanded: isExpanded,
+                    onHeaderAction: () => controller.toggleCompletedExpanded(),
+                  );
+                },
+              );
+            },
+          ),
         ],
+      ),
+    );
+  }
+
+  void _showSortSheet(BuildContext context) {
+    CommonBottomSheet.show(
+      context: context,
+      body: SortBottomSheet(
+        selectedSort: controller.currentSort,
+        onSortSelected: (value) {
+          controller.sortTasks(value);
+        },
       ),
     );
   }

@@ -38,7 +38,6 @@ class TaskDetailsController extends ChangeNotifier {
   }
 
   void addSubtask() {
-
     subtasks.add(Subtask(
       title: '',
       controller: TextEditingController(),
@@ -52,14 +51,15 @@ class TaskDetailsController extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> deleteSubtask(int index) async{
-    await _dbService.deleteSubtask(subtasks[index].id!);
+  Future<void> deleteSubtask(int index) async {
+    if (subtasks[index].id != null) {
+      await _dbService.deleteSubtask(subtasks[index].id!);
+    }
   }
 
   Future<void> saveChanges() async {
     final int taskId = task['id'];
     
-    // Save main task details
     final Map<String, dynamic> updatedRow = {
       'notes': notesController.text,
       'due_date': selectedDueDate?.millisecondsSinceEpoch,
@@ -69,11 +69,11 @@ class TaskDetailsController extends ChangeNotifier {
     // Save subtasks: This is a simplified approach (delete all and re-insert for the task)
     // In a real production app, you'd likely track dirty states or use a more efficient sync.
     // For this example, we'll follow the requirement to call updateSubtask logic.
-    
+
     // First, clear existing subtasks for this task in DB to sync properly
-    // Note: DatabaseService doesn't have a 'deleteAllSubtasksForTask' method, 
+    // Note: DatabaseService doesn't have a 'deleteAllSubtasksForTask' method,
     // so we'd ideally implement one. For now, we'll just save new/updated ones if they have content.
-    
+
     for (int i = 0; i < subtasks.length; i++) {
       final subtask = subtasks[i];
       subtask.title = subtask.controller?.text ?? subtask.title;
@@ -90,10 +90,12 @@ class TaskDetailsController extends ChangeNotifier {
     }
   }
 
-  void disposeControllers() {
+  @override
+  void dispose() {
     notesController.dispose();
     for (var subtask in subtasks) {
       subtask.controller?.dispose();
     }
+    super.dispose();
   }
 }

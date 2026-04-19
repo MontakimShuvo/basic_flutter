@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:untitled/di/injector.dart';
-import 'package:untitled/features/new_tab_screen/create_task_list_tab_screen.dart';
+import 'package:untitled/utils/app_router.dart';
 import '../../../data/services/database_service.dart';
 import '../../new_task/view/task_list_screen.dart';
 import '../../../widgets/tab_item.dart';
@@ -28,7 +29,7 @@ class HomeController extends ChangeNotifier {
           id: list['id'],
           taskName: list['name'],
           isFavouriteTab: list['name'] == "Favorites",
-          onDeleteList: ()=>_loadTaskLists()
+          onDeleteList: () => _loadTaskLists(),
         ));
       }
       notifyListeners();
@@ -47,6 +48,7 @@ class HomeController extends ChangeNotifier {
     taskControllers.add(NewTaskController(
       id: id,
       taskName: taskName,
+      onDeleteList: () => _loadTaskLists(),
     ));
 
     notifyListeners();
@@ -76,14 +78,14 @@ class HomeController extends ChangeNotifier {
     List<Widget> views = [];
     for (var controller in taskControllers) {
       views.add(
-          TaskListScreen(
-            controller: controller,
-            onRenameTap: () => gotoCreateTaskScreen(
-                context,
-                id: controller.id,
-                name: controller.taskName
-            ),
-          )
+        TaskListScreen(
+          controller: controller,
+          onRenameTap: () => gotoCreateTaskScreen(
+            context,
+            id: controller.id,
+            name: controller.taskName,
+          ),
+        ),
       );
     }
     views.add(const Center(child: Text("Click + to add a task")));
@@ -91,14 +93,12 @@ class HomeController extends ChangeNotifier {
   }
 
   void gotoCreateTaskScreen(BuildContext context, {int? id, String? name}) async {
-    final result = await Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => CreateTaskListTabScreen(
-          listId: id,
-          existingName: name,
-        ),
-      ),
+    final result = await context.push(
+      AppRouter.createTaskList,
+      extra: {
+        'listId': id,
+        'existingName': name,
+      },
     );
 
     if (result != null && result is Map && context.mounted) {
