@@ -34,15 +34,15 @@ class TaskDetailsScreen extends StatelessWidget {
     final int? createAtMillis = task['created_at'];
 
     final String createAtDate = createAtMillis != null
-        ? DateFormat(
-            'EEE, MMM d',
-          ).format(DateTime.fromMillisecondsSinceEpoch(createAtMillis))
+        ? DateFormat('EEE, MMM d').format(DateTime.fromMillisecondsSinceEpoch(createAtMillis))
         : '';
 
     return ChangeNotifierProvider(
       create: (_) => TaskDetailsController(task: task),
-      child: Consumer<TaskDetailsController>(
-        builder: (context, controller, child) {
+      child: Builder(
+        builder: (context) {
+          final controller = context.read<TaskDetailsController>();
+
           return PopScope(
             canPop: false,
             onPopInvokedWithResult: (didPop, result) async {
@@ -72,16 +72,12 @@ class TaskDetailsScreen extends StatelessWidget {
                   height: SizeConfig.screenHeight * AppConstants.percent80,
                   decoration: BoxDecoration(
                     color: Colors.white,
-                    borderRadius: BorderRadius.circular(
-                      AppConstants.valueDouble24,
-                    ),
+                    borderRadius: BorderRadius.circular(AppConstants.valueDouble24),
                   ),
                   child: Column(
                     children: [
                       Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: AppConstants.valueDouble12,
-                        ),
+                        padding: const EdgeInsets.symmetric(horizontal: AppConstants.valueDouble12),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
@@ -102,13 +98,9 @@ class TaskDetailsScreen extends StatelessWidget {
                       const SizedBox(height: AppConstants.valueDouble20),
                       Expanded(
                         child: SingleChildScrollView(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: AppConstants.valueDouble12,
-                          ),
+                          padding: const EdgeInsets.symmetric(horizontal: AppConstants.valueDouble12),
                           child: Container(
-                            padding: const EdgeInsets.all(
-                              AppConstants.valueDouble20,
-                            ),
+                            padding: const EdgeInsets.all(AppConstants.valueDouble20),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
@@ -136,13 +128,9 @@ class TaskDetailsScreen extends StatelessWidget {
                                 ),
                                 const SizedBox(height: AppConstants.valueDouble20),
                                 Row(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
                                   children: [
                                     const Icon(Icons.notes_outlined),
-                                    const SizedBox(
-                                      width: AppConstants.valueDouble12,
-                                    ),
+                                    const SizedBox(width: AppConstants.valueDouble12),
                                     Expanded(
                                       child: CommonInputField(
                                         controller: controller.notesController,
@@ -158,11 +146,9 @@ class TaskDetailsScreen extends StatelessWidget {
                                   child: Row(
                                     children: [
                                       const Icon(Icons.adjust),
-                                      const SizedBox(
-                                        width: AppConstants.valueDouble12,
-                                      ),
+                                      const SizedBox(width: AppConstants.valueDouble12),
                                       Selector<TaskDetailsController, DateTime?>(
-                                        selector: (_, controller) => controller.selectedDueDate,
+                                        selector: (_, c) => c.selectedDueDate,
                                         builder: (context, dueDate, child) {
                                           final String dueDateDisplay = dueDate != null
                                               ? DateFormat('EEE, MMM d, h:mm a').format(dueDate)
@@ -177,15 +163,13 @@ class TaskDetailsScreen extends StatelessWidget {
                                 Row(
                                   children: [
                                     const Icon(Icons.access_time),
-                                    const SizedBox(
-                                      width: AppConstants.valueDouble12,
-                                    ),
+                                    const SizedBox(width: AppConstants.valueDouble12),
                                     TaskDetailChip(text: createAtDate),
                                   ],
                                 ),
                                 const SizedBox(height: AppConstants.valueDouble25),
                                 Selector<TaskDetailsController, int>(
-                                  selector: (_, controller) => controller.subtasks.length,
+                                  selector: (_, c) => c.subtasks.length,
                                   builder: (context, length, child) {
                                     return Column(
                                       children: List.generate(length, (index) {
@@ -206,14 +190,10 @@ class TaskDetailsScreen extends StatelessWidget {
                                     const Icon(Icons.subdirectory_arrow_right),
                                     const SizedBox(width: AppConstants.valueDouble12),
                                     GestureDetector(
-                                      onTap: () {
-                                        controller.addSubtask();
-                                      },
+                                      onTap: () => controller.addSubtask(),
                                       child: const Text(
                                         "Add subtasks",
-                                        style: TextStyle(
-                                          fontSize: AppConstants.valueDouble16,
-                                        ),
+                                        style: TextStyle(fontSize: AppConstants.valueDouble16),
                                       ),
                                     ),
                                   ],
