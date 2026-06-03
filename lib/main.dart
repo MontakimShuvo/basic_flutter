@@ -24,3 +24,9 @@ class MyApp extends StatelessWidget {
   }
 }
 
+// @riverpod
+// class TxnCountNotifier extends _$TxnCountNotifier{
+//   late HomeRepo repo;
+//
+// }
+
